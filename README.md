@@ -62,7 +62,7 @@ ___
 2. 비용상의 이유 - 기업으로 사용할 경우 GitHub이 요금이 더 비쌈
 3. GitHub 이용 시 소스코드를 Microsoft사에 올리는 것으로 영업 비밀 유출 가능성 있다고 생각되어 꺼림
 
-##### CIL 
+##### CLI 
 CLI(Command-Line Interface) <-> GUI(Graphic User Interface)
 CLI : 명령어를 통해 사용자와 컴퓨터가 상호작용을 하는 방식 ex)MacOS - terminal / Windows - 명령 프롬프트(.cmd)
 Why CLI? 
