@@ -39,9 +39,9 @@
   
 
 #### bold, italic, strikeout로 글씨 작성
-**bold** : '*' 2개로 감싸 bold를 나타낼 수 있다. 
-*italic* : '*' 1개로 감싸 italic을 나타낼 수 있다. 
-~~strikeout~~ : '~' 2개로 strikeout을 나타낼 수 있다. 
+- **bold** : '*' 2개로 감싸 bold를 나타낼 수 있다. 
+- *italic* : '*' 1개로 감싸 italic을 나타낼 수 있다. 
+- ~~strikeout~~ : '~' 2개로 strikeout을 나타낼 수 있다. 
 
 #### `*` 혹은 `_` , `-` 를 3개 이상 사용하여 선을 그을 수 있다. 
 ___
