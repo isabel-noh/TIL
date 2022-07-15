@@ -1,8 +1,6 @@
 # TIL
 
 ---
-### Ground Rule
-
 
 ### Markdown 학습
  #### 제목(Heading) 표현하기
