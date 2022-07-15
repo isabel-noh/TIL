@@ -95,14 +95,14 @@ Markdown - e.g) velog, notion에성 마크다운 형식으로 글을 작성하�
 
 ---
 
-### Repository 
-#### 원격 Repository 
-#### Local Repository 
+# Repository 
+### 원격 Repository 
+### Local Repository 
  - git init 명령어: local repository 생성 및 초기화 
  		(git을 사용하기 위해 가장 기본적으로 필요한 요소를 초기화)
 
 
-#### git - 3가지 영역을 바탕으로 관리함
+### git - 3가지 영역을 바탕으로 관리함
 > Working Directory
 Staging Area
 Repository
@@ -127,7 +127,7 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
 ### git과 원격저장소 연결하기
 > - **git remote add origin 원격레포지토리url**: git과 원격 저장소 연결하는 명령어
 - **git remote -v**: origin http://github.com/~~ 등록한 Remote Repository 정보 확인
-- **git push origin master**: 연결된 원격 저장소에 로컬의 변경사항 업데이트 하기(master 브랜치에 업데이트)
+- **git push origin master**: 연결된 원격 저장소(여기서 원격 저장소의 이름은 origin, 브랜치는  master 브랜치)에 로컬의 변경사항 업데이트 하기(master 브랜치에 업데이트)
 - **git push -u origin master**:
 	- git push
 - **git pull origin master** : 원격 저장소의 변경 사항을 업데이트(원격 저장소로부터 받아와서 sync)
@@ -160,3 +160,31 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
 	 3. git push origin master
      
      
+### Branch
+`흐름의 분기`
+**pointer**는 하나의 커밋만 바라볼 수 있음
+**master**은 일반적으로 상용 pointer
+
+>- **git branch** : branch 리스트를 확인하는 명령어
+	- `*`이 붙은  branch가 HEAD가 바라보는 branch
+- **git branch branch이름** : 새로운 'branch이름'이름의 branch 생성하는 명령어
+- **git switch branch이름** : HEAD가 바라보는 branch를 변경하는 명령어
+- **git switch -c branch이름** : (-c : create ) 'branch이름'이름의 branch를 생성하고 pointer을 생성한 branch로 옮기는 명령어
+
+
+
+### 3-way Merging
+3-way Merging의 방법으로 머지를 하면 merge commit의 상태를 비교적 확실하게 확인할 수 있다. 
+#### 3-way Merging의 순서 
+> 1. 내 브랜치 commit
+2. 다른 사람의 브랜치 commit
+3. 두 브랜치의 공통 조상이 되는 merge commit
+
+
+[3-way Merge 참고](https://wonyong-jang.github.io/git/2021/02/05/Github-Merge.html)
+### Git Ignore
+`.gitignore` : 저장소에 추가되면 안 되는 파일과 폴더 목록을 모아놓은 파일
+**git repository를 생성하자마자 .gitignore파일을 생성해야 함**
+> 참고 [gitignore.io](https://www.toptal.com/developers/gitignore)
+ gitignore.io: 언어, OS 나 Framework, IDE 별로 저장소에 추가되면 안 되는 파일과 폴더 목록인 .gitignore 를 자동으로 생성해 주는 서비스
+
