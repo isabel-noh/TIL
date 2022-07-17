@@ -177,6 +177,7 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
 > 1. 내 브랜치 commit
 > 2. 다른 사람의 브랜치 commit
 > 3. 두 브랜치의 공통 조상이 되는 merge commit
+
 git은 merge를 할 때 각 브랜치의 마지막 커밋, 브랜치의 공통 조상 커밋을 비교하여 새로운 커밋을 만들어 병합을 수행한다.
 [3-way Merge 참고](https://wonyong-jang.github.io/git/2021/02/05/Github-Merge.html)
 
