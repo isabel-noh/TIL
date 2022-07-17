@@ -175,14 +175,20 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
 3-way Merging의 방법으로 머지를 하면 merge commit의 상태를 비교적 확실하게 확인할 수 있다. 
 #### 3-way Merging의 순서 
 > 1. 내 브랜치 commit
-2. 다른 사람의 브랜치 commit
-3. 두 브랜치의 공통 조상이 되는 merge commit
-
-
+> 2. 다른 사람의 브랜치 commit
+> 3. 두 브랜치의 공통 조상이 되는 merge commit
+git은 merge를 할 때 각 브랜치의 마지막 커밋, 브랜치의 공통 조상 커밋을 비교하여 새로운 커밋을 만들어 병합을 수행한다.
 [3-way Merge 참고](https://wonyong-jang.github.io/git/2021/02/05/Github-Merge.html)
+
+
 ### Git Ignore
-`.gitignore` : 저장소에 추가되면 안 되는 파일과 폴더 목록을 모아놓은 파일
+github에 올리기 전에 여러가지 이유로 add에서 제외해야하는 파일들이 있다. 
+> 보안상으로 위험성이 있는 파일
+> 프로젝트와 관계없는 파일
+> 용량이 너무 커서 제외해야되는 파일
+`.gitignore` : 저장소에 추가되면 안 되는 파일과 폴더 목록을 모아놓은 디렉토리
+git init을 한 폴더에 `.gitignore`이라는 이름의 파일을 만들고 그 안에 제외시키고 싶은 파일이나 폴더이름을 작성한다. 
 **git repository를 생성하자마자 .gitignore파일을 생성해야 함**
 > 참고 [gitignore.io](https://www.toptal.com/developers/gitignore)
- gitignore.io: 언어, OS 나 Framework, IDE 별로 저장소에 추가되면 안 되는 파일과 폴더 목록인 .gitignore 를 자동으로 생성해 주는 서비스
+>  gitignore.io: 언어, OS 나 Framework, IDE 별로 저장소에 추가되면 안 되는 파일과 폴더 목록인 .gitignore 를 자동으로 생성해 주는 서비스
 
