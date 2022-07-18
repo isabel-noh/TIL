@@ -66,22 +66,21 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
 	
 ### git 로컬에서 작업하기
 > - **git init**: local repository 생성 및 초기화 
-- **git add 파일이름.확장자**: 작업 디렉토리(working directory) 상의 변경 내용(삭제, 수정, 파일 생성 등... )을 버전으로 관리하고자, Staging Area에 추가하는 명령어
-- **git add .** : 현재 Working Directory의 모든 변경사항을 Staging Area에 올리는 명령어
-- **git status**: 현재 폴더의 git 상태를 확인하는 명령어
-- **git commit -m 메시지내용**: '메시지 내용'을 커밋 메시지(수정 이유)로 남기면서 버전을 기록하는 명령어
-- **git log**: 커밋한 기록을 확인하는 명령어
-- **git log --oneline** : 커밋한 기록을 간단하게 한 줄로만 확인하는 명령어
+> - **git add 파일이름.확장자**: 작업 디렉토리(working directory) 상의 변경 내용(삭제, 수정, 파일 생성 등... )을 버전으로 관리하고자, Staging Area에 추가하는 명령어
+> - **git add .** : 현재 Working Directory의 모든 변경사항을 > - **git status**: 현재 폴더의 git 상태를 확인하는 명령어
+> - **git commit -m 메시지내용**: '메시지 내용'을 커밋 메시지(수정 이유)로 남기면서 버전을 기록하는 명령어
+> - **git log**: 커밋한 기록을 확인하는 명령어
+> - **git log --oneline** : 커밋한 기록을 간단하게 한 줄로만 확인하는 명령어
 
 
 ### git과 원격저장소 연결하기
 > - **git remote add origin 원격레포지토리url**: git과 원격 저장소 연결하는 명령어
-- **git remote -v**: origin http://github.com/~~ 등록한 Remote Repository 정보 확인
-- **git push origin master**: 연결된 원격 저장소(여기서 원격 저장소의 이름은 origin, 브랜치는  master 브랜치)에 로컬의 변경사항 업데이트 하기(master 브랜치에 업데이트)
-- **git push -u origin master**:
+> - **git remote -v**: origin http://github.com/~~ 등록한 Remote Repository 정보 확인
+> - **git push origin master**: 연결된 원격 저장소(여기서 원격 저장소의 이름은 origin, 브랜치는  master 브랜치)에 로컬의 변경사항 업데이트 하기(master 브랜치에 업데이트)
+> - **git push -u origin master**:
 	- git push
-- **git pull origin master** : 원격 저장소의 변경 사항을 업데이트(원격 저장소로부터 받아와서 sync)
-- **git clone 원격레포지토리url** : 원격 저장소를 로컬 저장소로 복제해온다
+> - **git pull origin master** : 원격 저장소의 변경 사항을 업데이트(원격 저장소로부터 받아와서 sync)
+> - **git clone 원격레포지토리url** : 원격 저장소를 로컬 저장소로 복제해온다
 
 ## 협업과 복구 및 백업
 ### Remote Repo 생성 및 연결하기
@@ -109,17 +108,17 @@ commit: Staging Area안의 파일 하나 하나를 기록하는 것이 아니라
  	 2. git commit -m '커밋메시지'
 	 3. git push origin master
      
-     
 ### Branch
-`흐름의 분기`
+`흐름의 분기`  
+
 **pointer**는 하나의 커밋만 바라볼 수 있음
 **master**은 일반적으로 상용 pointer
 
 >- **git branch** : branch 리스트를 확인하는 명령어
 	- `*`이 붙은  branch가 HEAD가 바라보는 branch
-- **git branch branch이름** : 새로운 'branch이름'이름의 branch 생성하는 명령어
-- **git switch branch이름** : HEAD가 바라보는 branch를 변경하는 명령어
-- **git switch -c branch이름** : (-c : create ) 'branch이름'이름의 branch를 생성하고 pointer을 생성한 branch로 옮기는 명령어
+>- **git branch branch이름** : 새로운 'branch이름'이름의 branch 생성하는 명령어
+>- **git switch branch이름** : HEAD가 바라보는 branch를 변경하는 명령어
+>- **git switch -c branch이름** : (-c : create ) 'branch이름'이름의 branch를 생성하고 pointer을 생성한 branch로 옮기는 명령어
 
 
 
@@ -142,6 +141,7 @@ github에 올리기 전에 여러가지 이유로 add에서 제외해야하는 �
 `.gitignore` : 저장소에 추가되면 안 되는 파일과 폴더 목록을 모아놓은 디렉토리
 git init을 한 폴더에 `.gitignore`이라는 이름의 파일을 만들고 그 안에 제외시키고 싶은 파일이나 폴더이름을 작성한다. 
 **git repository를 생성하자마자 .gitignore파일을 생성해야 함**
+
 > 참고 [gitignore.io](https://www.toptal.com/developers/gitignore)
 >  gitignore.io: 언어, OS 나 Framework, IDE 별로 저장소에 추가되면 안 되는 파일과 폴더 목록인 .gitignore 를 자동으로 생성해 주는 서비스
 
