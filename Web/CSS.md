@@ -332,3 +332,6 @@ container, rows, column으로 컨텐츠를 배치하고 정렬
 - **12개의 column**
 - **6개의 grid breakpoints**
 
+#### offset
+열에 .col-*-offset-* class를 추가하면 오른쪽으로 열을 이동시킬 수 있다.  
+`<div class="col-md-2 col-md-offset-4">`의 경우, viewport 너비가 992px 이상이면 .col-md-4 만큼 오른쪽으로 이동한 후 .col-md-2 만큼의 너비를 갖는 열을 표시한다.
