@@ -270,3 +270,65 @@ float: left; /*요소를 왼쪽에 띄움*/
 </body>
 ```
 
+## Bootstrap
+#### CDN
+- Content Delivery(Distribution) Network  
+- 컨텐츠(CSS, JS, Image, Text 등)을 효율적으로 전달하기 위해 여러 노드에 가진 네트워크에 데이터를 제공하는 시스템  
+    - 개별 end-user의 가까운 서버를 통해 빠르게 전달 가능(지리적 이점)  
+    - 외부서버를 활용함으로써 본인 서버의 부하가 적어짐  
+
+### spacing(Margin & Padding)
+```html
+<div class="mt-3 ms-5">bootstrap-spacing</div>  
+<!-- m : property  
+t : sides  
+3 : size   
+-> margin top 3 -->
+```
+
+- property
+    - m : for classes that set *margin*
+    - p : for classes that set *padding*
+- sides
+    - t : for classes that set *margin-top* or *padding-top*
+    - b : for classes that set *bottom*
+    - s : for classes that set *start point*
+    - e : for classes that set *end point*
+    - x : for classes that set *\*-left* and *\*-right*
+    - y : for classes that set *\*-top* and *\*-bottom*
+    - blank : for classes that set a margin or padding on *all 4 sides* of the elements
+- size
+    - 0 : for classes that eliminate the margin or padding by setting it to 0
+    - 1 : (by default) for classes that set the margin or padding to \$spacer \* .25 (0.25rem)
+    - 2 : (by default) for classes that set the margin or padding to \$spacer \* .5  (0.5rem)
+    - 3 : (by default) for classes that set the margin or padding to \$spacer  (1rem)
+    - 4 : (by default) for classes that set the margin or padding to \$spacer \* 1.5  (1.5rem)
+    - 5 : (by default) for classes that set the margin or padding to \$spacer \* 3  (3rem)
+    - auto : for classes that set the margin to auto
+
+```
+mx-0?   
+가로(왼쪽, 오른쪽) margin 0  
+mx-auto?  
+수평 중앙 정렬, 가로 가운데 정렬   
+py-0?
+위 아래 padding 0
+```
+
+#### Responsive Web Design
+- 다양한 화면 크기를 가진 디바이스들이 등장함에 따라 responsive web design 개념이 등장  
+- 반응형 웹은 별도 기술 이름이 아니고 웹 디자인에 대한 접근 방식, 반응형 레잉아웃 작성에 도움이 되는 사례들의 모음 등을 기술하는 데 사용되는 용어
+- e.g. Media Queries, Flexbox, Bootstrap Grid System, The viewport meta tag .. 
+
+### Grid system
+요소들의 디자인과 배치에 도움을 주는 시스템  
+> - 기본요소  
+> Column : 실제 컨텐츠를 포함하는 부분  
+> Gutter : 칼럼과 칼럼 사이의 공간 (사이 간격)  
+> Container : Column들을 담고 있는 공간  
+
+부트스트랩 그리드 시스템은 flexbox로 제작됨  
+container, rows, column으로 컨텐츠를 배치하고 정렬  
+- **12개의 column**
+- **6개의 grid breakpoints**
+
