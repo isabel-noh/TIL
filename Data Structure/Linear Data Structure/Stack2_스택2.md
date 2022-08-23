@@ -30,6 +30,64 @@ step3. AB * CD /-
 - 연산자를 만나면 필요한 만큼의 피연산자를 스택에서 pop하여 연산하고, 연산결과를 다시 스택에 push
 - 수식이 끝나면 마지막으로 스택을 pop하여 출력
 
+```python
+str1 = '(6+5*(2-8)/2)'
+
+stack = []
+result = ''
+
+def my_eval(word, stack):
+    # word : 연산할 계산식(후위표기법)
+    # stack : 결과
+    # return stack
+    for char in word:
+        # 피연산자를 stack에 append
+        if char not in '+-/*':
+            stack.append(int(char))
+        else: 
+            x = stack.pop()
+            y = stack.pop()
+
+            if char == '+':
+                stack.append(y + x)
+            if char == '-':
+                stack.append(y - x)
+            if char == '*':
+                stack.append(y * x)
+            if char == '/':
+                stack.append(y / x)
+    return stack[-1]
+
+for char in str1:
+    # 연산자가 들어올 때
+    if char in '*/+-()':
+        if not stack:
+            stack.append(char)
+        
+        elif char == '(':
+            stack.append(char)
+        elif char in '*/':
+            while stack and stack[-1] in '*/':
+                result += stack.pop()
+            stack.append(char)
+        elif char in '+-':
+            while stack and stack[-1] != '(':
+                result += stack.pop()
+            stack.append(char)
+        elif char == ')':
+            while stack and stack[-1] != '(':
+                result += stack.pop()
+            stack.pop()
+    # 피연산자가 들어올 때
+    else:
+        result += char
+while stack: 
+    result += stack.pop()
+res = my_eval(result, [])
+print(f'result: {result}')
+print(f'res: {res}')
+```
+
 
 ## 백 트랙킹(Back Tracking)
 해를 찾는 도중에 막히면 (해가 아닌 경우) 되돌아가서 다시 해를 찾는 기법  
@@ -69,6 +127,73 @@ def checknode(v):
     - n개의 원소가 들어있는 집합의 2^n개의 부분집합을 만들 때에는, true / false값을 가지는 항목들로 구성된 n개의 배열들을 만드는 방법을 이용 
     - 배열의 i번째항목은 i번째원소가 부분집합의 값인지 아닌지를 확인하는 값  
     
+```python
+# 부분집합 구하기
+# 집합의 원소에 대해 각 부분집합에서의 포함 여부를 트리로 표현
+
+def f(i, N):
+    global answer
+    global cnt
+    cnt += 1
+    if i == N:
+        sum = 0
+        # print(bit)
+        for i in range(N):
+            if bit[i]:
+                # print(arr[i], end=' ')
+                sum += arr[i]
+        # print()
+        if sum == 10:
+            answer += 1
+            for i in range(N):
+                if bit[i]:
+                    print(arr[i], end=' ')
+            print()
+    else:
+        # bit[i] = 1  # A[i]가 부분집합에 포함
+        # f(i+1, N)
+        # bit[i] = 0
+        # f(i+1, N)
+        candidate = [0, 1]
+        for x in candidate:
+            bit[i] = x
+            f(i+1, N)
+
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+bit = [0] * 10
+answer = 0
+cnt = 0
+f(0, 10)
+print(answer, cnt)
+```
+
+부분집합 > 백트랙킹
+```python
+# i원소의 포함여부를 결정하면 i까지의 부분집합의 합s를 결정할 수 있음
+# s가 원하는 값보다 크면 남은 원소를 고려할 필요가 없음 
+
+def f(i, N, s, t):
+    global answer
+    global cnt
+    cnt += 1
+    if i == N:   # 모든 원소가 고려된 경우
+        if s== t:  # 부분집합의 합이 t이면
+            answer += 1
+        return   
+    elif s > t:   # 가지치기 ( 남은 원소를 고려할 필요가 없는 경우 )
+        return 
+    else:         # 남은 원소가 있고 s < t인 경우
+        f(i+1, N, s+arr[i], t)   # arr[i]가 포함된 경우
+        f(i+1, N, s, t)          # arr[i]가 포함되지 않은 경우
+    return 
+
+arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+bit = [0] * 10
+answer = 0
+cnt = 0
+f(0, 10, 0, 10)
+print(answer, cnt)
+```
 
 ## 순열
 - A[1, 2, 3]의 모든 원소를 사용한 순열
