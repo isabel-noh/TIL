@@ -73,4 +73,4 @@ Django에 적용된 디자인 패턴으로 MVC 디자인 패턴을 기반으로 
 
 > 데이터가 필요하다면 Model에 접근하여 데이터를 가져오고, 가져온 데이터를 template로 보내 화면을 구성하고, 구성된 화면을 응답으로 만들어 client에게 반환
 
-![https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbSqV1T%2FbtrpRXjBEOj%2FkeDZnehItOnHslVnekvnFK%2Fimg.png]
+![MVC](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbSqV1T%2FbtrpRXjBEOj%2FkeDZnehItOnHslVnekvnFK%2Fimg.png)
