@@ -74,3 +74,189 @@ Django에 적용된 디자인 패턴으로 MVC 디자인 패턴을 기반으로 
 > 데이터가 필요하다면 Model에 접근하여 데이터를 가져오고, 가져온 데이터를 template로 보내 화면을 구성하고, 구성된 화면을 응답으로 만들어 client에게 반환
 
 ![MVC](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbSqV1T%2FbtrpRXjBEOj%2FkeDZnehItOnHslVnekvnFK%2Fimg.png)
+
+
+## Django 기본설정
+
+##### 가상환경설정
+- 가상환경 생성
+`python -m venv venv`  
+
+- 가상환경 실행   
+`source venv/bin/activate` ( MAC OS )
+`source venv/Scripts/activate` ( Windows OS )
+
+- 가상환경 deactive
+`deactive`
+
+##### Django 설치
+- 설치 전 가상환경 설정 및 활성화를 마치고 진행  
+  `pip install django==3.2.13`
+
+> [참고]  
+LTS(Long Term Support) : 장기 지원 버전  
+일반적인 경우보다 장기간에 걸쳐 지원하도록 고안된 sw의 버전  
+컴퓨터 소프트웨어의 제품 수명주기 관리 정책  
+배포자는 LTS확정을 통하여 장기적이고 안정적인 지원을 보장
+- 패키지 목록 생성  
+  `pip freeze > requirements.txt`
+- 프로젝트 생성  
+  `django-admin startproject [project_name] .`
+- 서버 실행  
+  `python manage.py runserver`
+
+##### 프로젝트 구조
+
+##### Django Application
+- 앱 생성  
+  `python manage.py startapp [app_name 복수형]`
+
+##### 애플리케이션 구조
+
+- 애플리케이션 등록
+  프로젝트에서 앱을 사용하기 위하여 반드시 INSTALLED_APPS 리스트에 추가하여야 함
+  - INSTALLED_APPS : Django installation에 활성화 된 모든 앱을 지정하는 문자열 목록  
+  - **주의**  
+  **반드시 생성 후 등록할 것**  
+  INSTALLED_APPS에 먼저 작성 후 생성하려 하면 앱이 생성되지 않기 때문
+  ```python 
+  # settings.py
+  INSTALLED_APPS = [
+    # local apps
+    'articles',
+
+    # Third party apps
+
+    # Django apps
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+  ]
+  ```
+
+#### Project & Application
+- Projet 
+  - collection of apps
+  - 앱의 집합
+  - 프로젝트에는 여러 앱이 포함될 수 있으며, 앱은 여러 프로젝트에 포함되어있을 수 있음
+
+- Application
+  - 앱은 실제 요청을 처리하고 페이지를 보여주는 등의 역할을 담당 
+  - 앱은 하나의 역할 및 기능 단위로 작성하는 것을 권장 
+
+## 요청과 응답  
+URL > VIEW > TEMPLATE 순의 작성 순서로 데이터 흐름 이해  
+
+### URLs
+```python
+# urls.py
+from django.contrib import admin
+from django.urls import path
+from articles import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('index/', views.index),
+    path('greeting/', views.greeting),
+]
+```
+### View
+HTTP요청을 수신하고 HTTP응답을 반환하는 함수 작성  
+Template에게 HTTP응답 서식을 맡김  
+```python
+# view.py
+from django.shortcuts import render
+
+# Create your views here.
+def index(request):
+    return render(request, 'index.html')
+
+def greeting(request):
+    # return render(request, 'greeting.html', {'name': 'Isabel'})
+    foods = ['apple', 'banana', 'coconut',]
+    info = {
+        'name': 'Isabel'
+    }
+    context = {
+        'foods' : foods,
+        'info' : info,
+    }
+    return render(request, 'greeting.html', context)
+```
+#### render()
+`render(request, template_name, context)`
+- 주어진 템플릿을 주어진 컨텍스트 데이터와 결합하고 렌더링 된 텍스트와 함께 HttpResponse(응답) 객체를 반환하는 함수  
+1. request : 응답을 생성하는 데 사용되는 요청 객체
+2. template_name : 템플릿의 전체 이름 또는 템플릿 이름의 경로
+3. context : 템플릿에서 사용할 데이터(dictionary 타입)
+
+
+### Templates
+실제 내용을 보여주는 데 사용되는 파일  
+파일 구조나 레이아웃을 정의  
+- app_name/templates/
+- 주의!  
+  **템플릿 폴더 이름은 반드시 templates여야 함** 
+```html
+<!--articles/templates/index.html-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--생략-->
+</head>
+<body>
+  <h1>만나서 반가워요</h1>
+  <a href="/greeting">greeting</a>
+</body>
+</html>
+```
+
+
+
+
+
+
+## Sending form data(Client)
+### HTML < form > element
+데이터가 전송되는 방식을 정의   
+웹에서 사용자 정보를 입력하는 여러 방식(text, button, submit 등)을 제공, **사용자로부터 할당된 데이터를 서버로 전송하는 역할 담당**
+- 데이터를 어디action로 어떤 방식method으로 보낼 것인가
+#### ACTION
+- 입력 데이터가 전송될 URL지정  
+- 데이터를 어디로 보낼 것인지를 지정하는 것  
+- 중요! **유효한 URL일 것**  
+  > 만약 속성을 지정하지 않으면 데이터는 현재 form이 있는 페이지의 URL로 보내짐  
+#### METHOD
+- 데이터를 어떻게 보낼 것인지 정의  
+- 입력 데이터의  HTTP request methods를 지정  
+- HTML form 데이터 전송방식 : **GET / POST**
+
+### HTML < input > element
+사용자로부터 데이터를 입력받기 위하여 사용  
+- 'type'속성에 따라 동작 방식이 달라짐  
+- 지정하지 않은 경우, 기본값은 'text'
+
+#### HTML input's attribute
+##### name
+- form을 통해 데이터를 submit할 때 name속성에 설정된 값을 서버로 전송하고, 서버는 name속성에 설정된 값을 통해 사용자가 입력한 데이터에 접근할 수 있음  
+- GET/POST 방식으로 서버에 전달하는 파라미터로 매핑하는 것 (name - key, value - value)
+  - GET방식에서는 URL에서 `?key=value&key=value/`형식으로 데이터 전달
+
+
+### HTTP request methods
+- HTTP
+  - HTML문서와 가타은 리소스(데이터, 자원)을 가져올 수 있도록 해주는 프로토콜(규칙, 규약)
+  - 웹에서 이루어지는 모든 데이터 교환의 기초
+  - HTTP는 주어진 리소스가 수행할 원하는 작업을 나타내는 request methods를 정의
+- 자원에 대한 행위(수행하고자 하는 동작)을 정의
+- 주어진 resource자원에 수행하기를 원하는 행동을 나타냄
+- **GET, POST, PUT, DELETE**
+  
+#### GET
+- 서버로부터 정보를 조회하는 데 사용(리소스 요청)
+- 데이터를 가져올 때만 사용해야
+- 데이터를 서버로 전송할 때 Query String Parameters를 통해 전송
+  - 데이터는 URL에 포함되어 서버로 보내짐
