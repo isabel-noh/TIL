@@ -106,14 +106,44 @@ LTS(Long Term Support) : 장기 지원 버전
   `python manage.py runserver`
 
 ##### 프로젝트 구조
-
+- \__init__.py
+  - python에게 이 디렉토리를 하나의 python package로 다루도록 지시
+  - 별도로 추가 코드를 작성하지 않음
+- asgi.py
+  - Asynchronous Server Gateway Interface
+  - Django application이 비동기식 웹 서버와 연결 및 소통하는 것을 도움
+- settings.py
+  - Django 프로젝트 설정을 관리
+- urls.py 
+  - 사이트의 url과 적절한 views의 연결을 지정
+- wsgi.py
+  - Web Server Gateway Interface
+  - Django 어플리케이션이 웹서버와 연결 및 소통하는 것을 도움
+- manage.py
+  - Django 프로젝트와 다양한 방법으로 상호작용하는 커맨드라인 유틸리티
+  ```python
+  # manage.py Usage
+  python manage.py <command [options]>
+  ```
 ##### Django Application
 - 앱 생성  
   `python manage.py startapp [app_name 복수형]`
 
 ##### 애플리케이션 구조
+- admin.py
+  -관리자용 페이지를 설정하는 곳
+- app.py
+  - 앱의 정보가 작성된 곳
+- models.py
+  - 어플리케이션에서 사용하는 Model을 정의하는 곳
+  - MTV의 M
+- tests.py
+  - 프로젝트의 테스트 코드를 작성하는 곳
+- views.py
+  - view 함수들이 정의되는 곳
+  - MTV 패턴의 V  
 
-- 애플리케이션 등록
+##### 애플리케이션 등록  
   프로젝트에서 앱을 사용하기 위하여 반드시 INSTALLED_APPS 리스트에 추가하여야 함
   - INSTALLED_APPS : Django installation에 활성화 된 모든 앱을 지정하는 문자열 목록  
   - **주의**  
@@ -214,6 +244,71 @@ def greeting(request):
 </html>
 ```
 
+> **데이터의 흐름 순서**  
+URL > View > Template   
+코드 작성도 동일한 순서로! 
+
+> [기타 설정]
+Language_Code : 모든 사용자에게 제공되는 번역을 결정  
+USE_I18이 활성(True)되어야 함  
+TIME_ZONE : 데이터베이스 연결의 시간대를 나타내는 문자열 지정  
+USE_TZ이 활성화(True)되고 이 옵션이 설정된 경우 데이터베이스에서 날짜와 시간을 읽으면, UTC 대신 새로 설정한 시간대의 인식 날짜&시간이 반환됨
+
+```python
+# settings.py
+LANGUAGE_CODE = 'ko-kr'
+TIME_ZONE = 'Asia/Seoul'
+```
+## Django Template
+데이터 표현을 제어하는 도구 / 표현에 관련된 로직    
+Django Template를 이용한 HTML 정적 부분과 동적 컨텐츠 삽입  
+Template System의 기본 목표를 숙지
+
+### Django Template Language(DTL)
+Django Template에서 사용하는 built-in template system  
+- 조건, 반복, 변수 치환, 필터 등의 기능 제공 
+  - Python처럼 일부 프로그래밍 구조(if, for 등)을 사용할 수 있지만 python 코드로 실행되는 것은 아님 
+  - Django Template System은 단순히 Python이 HTML에 포함된 것이 아님을 주의  
+  - 프로그ㅐㄹ밍적 로직이 아니라 프레젠테이션을 표현하기 위한 것임을 명심! 
+
+### DTL syntax
+#### 1. Variable
+`{{ variable }}`  
+- 변수명은 영어, 숫자, (_)밑줄로 구성될 수 있으나, 밑줄로는 시작할 수 없음  
+  - 공백이나 구두점은 사용할 수 없음
+- dot(.)을 사용하여 변수 속성에 접근할 수 있음
+- render()의 세번째 인자로, {'key':'value'}와 같이 딕셔너리 형태로 전달되며, 여기서 정의한 key에 해당하는 문자열이 template에서 사용가능한 변수명이 됨  
+
+#### 2. Filters
+`{{ variable|filter }}`  
+- 표시할 변수를 수정할 때 사용 
+  - name변수를 모두 소문자료 출력 {{ name|lower }}  
+- 60개의 built-in template filters 제공
+- chained가 가능하며 일부 필터는 인자를 받기도 함 (e.g. {{ name|truncatewords:30 }})
+
+#### 3. Tags
+`{% tag %}`
+- 출력 텍스트를 만들거나, 반복 또는 논리를 수행하여 제어 흐름을 만드는 등 변수보다 복잡한 일들을 수행  
+- 일부 태그는 시작과 종료 태그가 필요  
+  - `{% if %}` / `{% for %}`
+- 약 24개의 built-in template tags를 제공
+
+#### 4. Comments
+`{# #}`
+- Django Template에서 라인의 주석을 표현하기 위해 사용
+- 아래처럼 유효하지 않은 템플릿 코드가 표함될 수 있음 
+  - {# {% if %} text {% enif %} #}
+- 한줄 주석에만 사용할 수 있음
+- 여러 줄 주석은 {% comment %}와 {% endcomment %}사이에 입력
+```django
+{% comment %}
+  주석
+  주석
+{% endcomment %}
+```
+
+## Template Inheritace
+
 
 
 
@@ -260,3 +355,6 @@ def greeting(request):
 - 데이터를 가져올 때만 사용해야
 - 데이터를 서버로 전송할 때 Query String Parameters를 통해 전송
   - 데이터는 URL에 포함되어 서버로 보내짐
+
+
+
