@@ -52,3 +52,22 @@ INSTALLED_APPS = [
     ...
 ]
 ```
+
+
+## Migration
+
+
+..
+`python `
+
+
+## ORM
+Object-Relational-Mapping  
+
+
+### QuerySet API
+[사전 준비]  
+
+
+
+>[참고] Shell
