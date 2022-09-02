@@ -278,6 +278,24 @@ Django Template에서 사용하는 built-in template system
   - 공백이나 구두점은 사용할 수 없음
 - dot(.)을 사용하여 변수 속성에 접근할 수 있음
 - render()의 세번째 인자로, {'key':'value'}와 같이 딕셔너리 형태로 전달되며, 여기서 정의한 key에 해당하는 문자열이 template에서 사용가능한 변수명이 됨  
+```python
+# views.py
+def greeting(request):
+    foods = ['apple', 'banana', 'coconut']
+    info = {
+        'name' : 'Isabel'
+    }
+    context = {
+        'foods' : foods,
+        'info' : info,
+    }
+    return render(request, 'greeting.html', context)
+```
+```django
+# greeting.html
+<p>저는 {{foods.0}}을 가장 좋아합니다</p>
+<p>안녕하세요, 저는 {{info.name}}입니다. </p>
+```
 
 #### 2. Filters
 `{{ variable|filter }}`  
@@ -285,6 +303,22 @@ Django Template에서 사용하는 built-in template system
   - name변수를 모두 소문자료 출력 {{ name|lower }}  
 - 60개의 built-in template filters 제공
 - chained가 가능하며 일부 필터는 인자를 받기도 함 (e.g. {{ name|truncatewords:30 }})
+```python
+# views.py
+def dinner(request):
+    foods = ['족발', '팔보채', '스시', '과일']
+    pick = random.choice(foods)
+    context = {
+        'foods' : foods,
+        'pick' : pick,
+    }
+    return render(request, 'dinner.html', context)
+```
+```django
+# dinner.html
+<p>{{pick}}은 {{pick|length}} 글자입니다.</p>
+<p>{{foods|join:", "}}</p>
+```
 
 #### 3. Tags
 `{% tag %}`
@@ -292,7 +326,14 @@ Django Template에서 사용하는 built-in template system
 - 일부 태그는 시작과 종료 태그가 필요  
   - `{% if %}` / `{% for %}`
 - 약 24개의 built-in template tags를 제공
-
+```django 
+<p>메뉴판</p>
+    <ul>
+      {% for food in foods %}
+        <li>{{ food }}</li>
+      {% endfor %}
+    </ul>
+```
 #### 4. Comments
 `{# #}`
 - Django Template에서 라인의 주석을 표현하기 위해 사용
@@ -307,11 +348,85 @@ Django Template에서 사용하는 built-in template system
 {% endcomment %}
 ```
 
-## Template Inheritace
+## Template Inheritace 템플릿 상속
+코드의 재사용성을 위해  
+템플릿 상속을 사용하면 사이트의 모든 공통 요소를 포함하고, 하위 템플릿이 재정의(override)할 수 있는 블록을 정의하는 기본 **'skeleton'** 템플릿을 만들 수 있음
 
+- `{% extends '' %}`
+  - 자식(하위)템플릿이 부모 템플릿을 확장한다는 것을 알림
+  -  반드시 템플릿 **최상단**에 작성되어야 함 -> 2개 이상 사용할 수 없음  
 
+- `{% block content %}{% endblock content %}`
+  - 하위 템플릿에서 재지정(override)할 수 있는 블록을 정의
+  - 하위 템플릿이 채울 수 있는 공간
+  - 가독성을 높이기 위해서 선택적으로 endblock 태그에 이름을 지정할 수 있음(안 써도 됨)
 
+```django
+<!--base.html-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- bootstrap CDN 작성 -->
+    <title>document</title>    
+  </head>
+  <body>
+    {% block content %}
+    {% endblock content %}
+    <!-- bootstrap CDN 작성 -->
+  </body>
+</html>
+```
+```django
+<!-- index.html -->
+{% extends 'base.html' %}
 
+{% block content %}
+  <h1>만나서 반가워요!</h1>
+  <a href="/greeting/">greeting</a>
+  <a href="/dinner/">dinner</a>
+{% endblock content %}
+```
+
+##### 추가 템플릿 경로 추가하기
+- base.html의 위치를 앱 안의 template 디렉토리가 아닌 프로젝트 최상단의 templates 디렉토리 안에 위치하고 싶다면?
+- 기본 template 경로가 아닌 다른 경로를 추가하기 위해 다음 코드 작성   
+`'DIRS': [BASE_DIR / 'templates',],`
+```python
+# settings.py
+
+TEMPLATES = [
+  {
+    # 'BACKEND': '...',
+    'DIRS': [BASE_DIR / 'templates',],
+    # 'APP_DIRS':True,
+    ...
+  }
+]
+```
+```directory
+articles/
+firstpjt/
+templates/
+    base.html
+```
+
+>[참고] BASE_DIR 
+>- settings.py에서 특정 경로를 절대 경로로 편하게 작성할 수 있도록 Django에서 미리 지정해둔 경로 값 
+>- 객체 지향 파일 시스템 경로
+>   - 운영체제별로 파일 경로 표기법이 다르기 때문에 어떤 운영체제에서 실행되더라도 각 운영체제 표기법에 맞게 해석될 수 있도록 하기 위하여 사용  
+```django
+# settings.py
+BASE_DIR = Path(__file__).resolve().parent.parent
+```
+
+# Sending and Retrieving form data
+### Client & Server Architecture
+- 웹은 다음과 같이 가장 기본적으로 클라이언트-서버 아키텍처를 사용
+  - 클라이언트가 서버에 요청을 보내고, 서버는 클라이언트의 요청에 응답
+- 클라이언트 측에서 HTML form은 HTTP요청을 서버에 보내는 가장 쉬운 방법
+- 이를 통하여 사용자는 HTTP 요청에서 전달할 정보를 제공할 수 있음
 
 
 ## Sending form data(Client)
@@ -329,6 +444,15 @@ Django Template에서 사용하는 built-in template system
 - 입력 데이터의  HTTP request methods를 지정  
 - HTML form 데이터 전송방식 : **GET / POST**
 
+```django
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Throw</h1>
+  <form action="#" mehtod="#"></form>
+{% endblock content %}
+```
+
 ### HTML < input > element
 사용자로부터 데이터를 입력받기 위하여 사용  
 - 'type'속성에 따라 동작 방식이 달라짐  
@@ -336,14 +460,34 @@ Django Template에서 사용하는 built-in template system
 
 #### HTML input's attribute
 ##### name
-- form을 통해 데이터를 submit할 때 name속성에 설정된 값을 서버로 전송하고, 서버는 name속성에 설정된 값을 통해 사용자가 입력한 데이터에 접근할 수 있음  
+- form을 통해 데이터를 submit할 때 name속성에 설정된 값을 서버로 전송하고, 서버는 **name**속성에 설정된 값을 통해 사용자가 입력한 **데이터에 접근**할 수 있음  
 - GET/POST 방식으로 서버에 전달하는 파라미터로 매핑하는 것 (name - key, value - value)
   - GET방식에서는 URL에서 `?key=value&key=value/`형식으로 데이터 전달
+```python
+# urls.py
+  path('throw/', views.throw),
 
+# views.py
+def throw(request):
+    return render(request, 'throw.html')
+```
+```django
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Throw</h1>
+    <form action="#" mehtod="#">
+        <label for="message">Throw</label>
+        <input type="text" id="message" name="message">
+        <input type="submit">
+    </form>
+
+{% endblock content %}
+```
 
 ### HTTP request methods
 - HTTP
-  - HTML문서와 가타은 리소스(데이터, 자원)을 가져올 수 있도록 해주는 프로토콜(규칙, 규약)
+  - HTML문서와 같은 리소스(데이터, 자원)을 가져올 수 있도록 해주는 프로토콜(규칙, 규약)
   - 웹에서 이루어지는 모든 데이터 교환의 기초
   - HTTP는 주어진 리소스가 수행할 원하는 작업을 나타내는 request methods를 정의
 - 자원에 대한 행위(수행하고자 하는 동작)을 정의
@@ -355,6 +499,102 @@ Django Template에서 사용하는 built-in template system
 - 데이터를 가져올 때만 사용해야
 - 데이터를 서버로 전송할 때 Query String Parameters를 통해 전송
   - 데이터는 URL에 포함되어 서버로 보내짐
+- 명시적 표현을 위해 대문자 사용
+```django
+<form action="#" mehtod="GET">
+    ...
+</form>
+```
+
+##### Query String Parameters
+사용자가 입력 데이터를 전달하는 방법 중 하나로 url주소에 데이터를 파라미터를 통해 넘기는 것  
+- 문자열은 `&(앰퍼샌드)`로 연결된 key=value 쌍으로 구성되며, 기본 URL과 `?(물음표)`로 구분됨
+  - https://host:port/path?key=value&key=value
+- == Query String
+- 정해진 주소 이후에 '물음표'를 쓰는 것으로 시작
+- 파라미터가 여러 개일 경우 '&'로 여러 개의 파라미터를 넘길 수 있음
 
 
+
+## Retrieving the data(Server)
+- 데이터 가져오기(검색하기)  
+- 서버는 클라이언트로 받은 key-value 쌍의 목록과 같은 데이터를 받게 됨  
+- 목록에 접근하는 방법은 사용하는 특정 프레임워크에 따라 상이
+```python
+# views.py
+def catch(request):
+    return render(request, 'catch.html')
+    
+# urls.py
+  path('catch/', views.catch)
+```
+```django
+<!-- catch.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Catch</h1>
+    <h2>여기서 데이터 받음</h2>
+    <a href="/throw/"> 다시 던지러 </a>
+{% endblock content %}
+```
+throw.html 파일의 form의 action도 적어줘야함
+```django
+<!-- throw.html -->
+<form action="/catch/" method="GET">
+    <label for="message">Throw</label>
+    <input type="text" id="message" name="message">
+    <input type="submit">
+</form>
+```
+
+#### 데이터 가져오기
+throw 페이지의 form이 보낸 데이터는 catch 페이지의 url에 포함되어 서버로 보내짐
+```url
+http://127.0.0.1:8000/catch/?message=데이터
+```
+> view함수의 첫번째 인자 **request**를 확인
+```python
+# views.py
+def catch(request):
+    message = request.GET.get('message')
+    context = {
+        'message' : message, 
+    }
+    return render(request, 'catch.html', context)
+```
+```django
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Catch</h1>
+    <h2>여기서 데이터 {{ message }} 받음</h2>
+    <a href="/throw/"> 다시 던지러 </a>
+{% endblock content %}
+```
+
+#### Request and Response objects
+- 요청과 응답 객체 흐름
+1. 페이지가 요청되면 Django는 요청에 대한 메타데이터를 포함하는 HttpRequest object 생성
+2. 해당하는 적절한 view 함수를 로드하고 HttpRequest를 첫번째 인자로 전달
+3. view함수는 HttpResponse object를 반환
+
+## Django Urls
+### Trailing URL Slashes
+- Django는 URL 끝에 `/`(trailing slash)가 없다면 자동으로 붙여주는 것이 기본 설정
+  - 모든 주소가 '/'로 끝나도록 구성되어있음
+  - 모든 프레임워크가 위처럼 동작하는 것은 아님
+  - Django의 url 설계 철학 상 기술적인 측면에서 foo.com/bar 와 foo.com/bar/는 서로 다른 URL임
+  - Django는 URL을 정규화하여 검색 엔진 로봇이 혼동하지 않도록 함
+
+>[참고] URL 정규화  
+정규 URL(오리지널로 평가되어야 할 URL)을 명시하는 것  
+복수 페이지에서 같은 컨텐츠가 존재하는 것을 방지
+
+### Variable Routing
+템플릿의 많은 부분이 중복되고, 일부분만 변경되는 상황에서 비슷한 URL과 템플릿을 계속 만드는 것은 불필요   
+Variable routing: URL 주소를 변수로 사용하는 것  
+URL 일부를 변수로 지정하여 view함수의 인자로 넘길 수 있음  
+변수 값에 따라 하나의 path()에 여러 페이지를 연결시킬 수 있음 
+#### Variable Routing 작성
 
