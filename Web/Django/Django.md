@@ -98,8 +98,11 @@ LTS(Long Term Support) : 장기 지원 버전
 일반적인 경우보다 장기간에 걸쳐 지원하도록 고안된 sw의 버전  
 컴퓨터 소프트웨어의 제품 수명주기 관리 정책  
 배포자는 LTS확정을 통하여 장기적이고 안정적인 지원을 보장
+
 - 패키지 목록 생성  
   `pip freeze > requirements.txt`
+  - requirements.txt의 파일을 모두 설치하고자 할 때   
+    `pip install -r requirements.txt`
 - 프로젝트 생성  
   `django-admin startproject [project_name] .`
 - 서버 실행  
@@ -476,7 +479,7 @@ def throw(request):
 
 {% block content %}
     <h1>Throw</h1>
-    <form action="#" mehtod="#">
+    <form action="#" method="#">
         <label for="message">Throw</label>
         <input type="text" id="message" name="message">
         <input type="submit">
@@ -501,7 +504,7 @@ def throw(request):
   - 데이터는 URL에 포함되어 서버로 보내짐
 - 명시적 표현을 위해 대문자 사용
 ```django
-<form action="#" mehtod="GET">
+<form action="#" method="GET">
     ...
 </form>
 ```
@@ -596,5 +599,119 @@ def catch(request):
 Variable routing: URL 주소를 변수로 사용하는 것  
 URL 일부를 변수로 지정하여 view함수의 인자로 넘길 수 있음  
 변수 값에 따라 하나의 path()에 여러 페이지를 연결시킬 수 있음 
+
 #### Variable Routing 작성
+- 변수는 '<>'에 정의하며 view함수의 인자로 할당됨 
+- 기본타입은 string이며, 그 외 4가지가 있음
+  - 1. str 
+    - '/'를 제외하고 비어있지 않은 모든 문자열
+    - 작성하지 않을 경우 기본값
+  - 2. int
+    - 0 또는 양의 정수와 매치
+  - 3. slug
+  - 4. uuid
+  - 5. path
+
+```python
+# urls.py
+from articles import views
+
+urlpatterns = [
+  ...,
+  # path('hello.<str:name>/', views.hello),
+  path('hello/<name>/', views.hello),
+]
+
+# articles/views.py
+def hello(request, name):
+  context = {
+    'name' : name,
+  }
+  return render(request, 'hello.html', context)
+```
+
+```django
+<!-- hello.html -->
+{% extends 'base.html' %}
+
+{% block content%}
+  <h1> 만나서 반갑습니다. {{ name }} </h1>
+{% endblock %}
+```
+> [참고] Routing  
+> 어떤 네트워크 안에서 통신 데이터를 보낼 때 최적의 경로를 선택하는 과정  
+
+### App URL mapping
+- 앱이 점점 늘어날 수록 urls.py를 각 app에 매핑하여야 혼동을 방지할 수 있음
+- app의 view 함수가 많아지면서 사용하는 path() 또한 늘어나고, app 또한 더 많이 작성될 것이기 때문에 프로젝트의 urls.py에서 모두 관리하는 것은 프로젝트 유지보수에 좋지 않음
+- 두번째 app인 pages를 생성 및 등록 
+
+> - 각 앱의 view 함수를 다른 이름으로 import할 수 있음
+>    ```python
+>   from articles import views as articles_views  
+>   from pages import views as pages_views
+>   ```
+> but 너무 불편하고 귀찮은 방법임
+
+#### **하나의 프로젝트에 여러 앱이 존재한다면, 각각 앱 안에 urls.py를 만들고 프로젝트 urls.py에서 각 앱의 urls.py 파일로 URL 매핑을 위탁할 수 있음**
+```python
+# articles/urls.py
+from django.urls import path
+from . import views
+urlpatters = [
+  path('index/', views.index),
+  path('greeting/', views.greeting),
+  path('dinner/', views.dinner),
+  path('throw/', views.throw),
+  path('catch/', views.catch),
+  path('hello/<str:name>', views.hello)
+]
+
+# pages/urls.py
+from django.urls import path
+urlpatters = [
+
+]
+```
+
+- **Including other URLconfs**  
+  - urlpattern은 언제든지 다른 URLconf 모듈을 포함(include)할 수 있음  
+  - include되는 app의 url.py에 urlpatterns가 작성되어 있지 않다면 에러가 발생  
+    - 빈 리스트라도 작성되어있어야 함  
+    ```python
+    # firstpjt/urls.py
+    from django.contrib import admin      
+    from django.urls import path, include
+
+    urlpatters = [
+      path('admin/', admin.site.urls),
+      path('articles/', include('articles.urls')),
+      path('pages/', include('pages.urls')),
+    ]
+    ```
+
+  - http: // 127.0.0.1:8000 / index / > `http://127.0.0.1:8000/articles/index/`
+
+
+##### include()
+  - 다른 URLconf(app1/urls.py)들을 참조할 수 있도록 돕는 함수  
+  - 함수 include()를 만나게 되면 URL의 그 시점까지 일치하는 부분을 잘라내고, 남은 문자열 부분을 후속 처리를 위해 include된 URLconf로 전달  
+
+#### Naming URL patterns
+링크에 URL을 직접 작성하는 것이 아니라 path() 함수의 name 인자를 정의하여 사용  
+DTL tag 중 **URL 태그**를 사용하여 path 함수에 작성한 name 사용({% url '' %})  
+```python
+urlpatters = [
+      path('index/', views.index, name='index'),
+      path('greeting/', views.greeting, name='greeting'),
+      path('dinner/', views.dinner, name='dinner'),
+      ...
+    ]
+```
+
+- URL tag
+  - `{% url '' %}`
+  - 주어진 URL 패턴 이름 및 선택적 매개변수와 일치하는 절대 경로 주소를 반환
+  - 템플릿에 URL을 하드 코딩하지 않고도 DRY(do not repeat yourself) 원칙을 위반하지 않으면서 링크를 출력하는 방법  
+
 

@@ -92,4 +92,13 @@ Object-Relational-Mapping
 - 
 
 ### CRUD
+#### Create
 
+#### Read
+QuerySet API method를 사용하여 데이터를 다양하게 조회하기  
+- Methods that "return new querysets" -> 데이터 목록 조회
+- Methods that "do not return querysets" -> 데이터 개별 조회
+
+#### Update
+
+#### Delete
