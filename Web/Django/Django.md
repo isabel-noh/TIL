@@ -86,6 +86,9 @@ Django에 적용된 디자인 패턴으로 MVC 디자인 패턴을 기반으로 
 `source venv/bin/activate` ( MAC OS )
 `source venv/Scripts/activate` ( Windows OS )
 
+- interpreter 설정 
+`현재 경로의 venv/Scripts/의 python`으로 설정
+
 - 가상환경 deactive
 `deactive`
 
