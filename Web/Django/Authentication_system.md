@@ -112,8 +112,59 @@ HTTP 쿠키는 상태가 있는 세션을 만들도록 해 줌
 로그인하고자 하는 사용자의 정보를 얻음  
  데이터가 유효한지 검증  
 
-## Login
+### Login
 #### login()
 `login(request, user, backend=None)`  
 인증된 사용자를 로그인시키는 로직으로 view 함수에서 사용됨  
 현재 세션에 연결하려는 인증된 사용자가 있는 경우 사용  
+
+### Logout
+#### logout()
+
+```python
+# accounts/views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout as auth_logout
+
+def logout(request):
+    auth_logout(request)
+    return redirect('articles:index')
+```
+```python
+# accounts/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'accounts'
+urlpatterns=[
+    path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
+]
+```
+```django
+<!-- base.html -->
+<form action="{% url 'accounts:logout' %}" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="logout">
+</form>
+```
+
+## Authentication with User
+User Object와 User CRUD   
+- 회원가입, 회원탈퇴, 회원정보수정, 비밀번호 변경
+
+### 회원가입
+User - Create  / UserCreationForm built-in form을 사용  
+#### UserCreationForm  
+주어진 username과 password로 권한이 없는 새 유저를 생성하는 ModelForm
+- username(from the user model)
+- password1
+- password2
+
+
+### 커스텀 유저 모델을 사용하려면 다시 작성하거나 확장해야하는 forms
+1. UserCreationForm
+2. UserChangeForm  
+
+두 form 모두 class Meta: model = User가 등록된 form이기 때문에 반드시 확장 및 커스텀 하여야 함
