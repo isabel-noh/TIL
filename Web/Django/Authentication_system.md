@@ -177,3 +177,42 @@ User - Create  / UserCreationForm built-in form을 사용
 2. UserChangeForm  
 
 두 form 모두 class Meta: model = User가 등록된 form이기 때문에 반드시 확장 및 커스텀 하여야 함
+
+##### get_user_model()  
+'현재 프로젝트에서 활성화된 유저 모델(active user model)'을 반환  
+Django는 직접 User Model을 참조하지 않고 `get_user_model()`을 사용하기를 강력 권고
+- 직접 User Model을 참조하지 않는 이유? 
+    - e.g. 기존 User Model이 아닌 User Model을 커스텀한 경우, 커스텀 User Model을 자동으로 반환하여 주기 때문  
+
+
+
+>[참고] UserCreationForm의 save()메서드  
+>- user을 반환
+>```python
+>def save(self, commit=True):
+>    user = super().save(commit=False)
+>    user.set_password(self.cleaned_data["password1"])
+>    if commit:
+>        user.save()
+>    return user
+>```
+
+ㄴㅇㄹ호ㅓㅏㅣ
+
+
+> [참고] 탈퇴하면서 해당 유저의 세션정보도 함께 지우고 싶은 경우 
+>```python
+>def delete(request):
+>    request.user.delete()
+>    # 회원탈퇴할 때 로그아웃하고 탈퇴하려는 경우
+>    auth_logout(request)
+>    return redirect('articles:index')
+>```
+> 로그아웃을 먼저 하게 되면 해당 요청 객체의 정보가 먼저 없어져버리기 때문에 탈퇴에 필요한 유저 정보도 삭제되어 버림
+
+
+### 회원정보 수정
+회원정보 수정은 User정보를 Update하는 것이며 UserChangeForm built-in form 사용  
+#### UserChangeForm
+- 사용자의 정보 및 권한을 변경하기 위해 admin Interface에서 사용되는 ModelForm
+- UserChangeForm 또한 ModelForm이기 때문에 instance 인자로 기존 User정보를 받는 구조 또한 동일 

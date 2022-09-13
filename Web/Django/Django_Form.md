@@ -127,34 +127,33 @@ class ArticleForm(forms.ModelForm):
     - fields와 exclude를 함께 작성하여도 되나 권장 X
 
 
-##### [참고] Meta data  
-데이터를 표현하기 위한 데이터  
+> [참고] Meta data  
+> 데이터를 표현하기 위한 데이터  
 > e.g. 사진 파일  
-사진 데이터  
-사진 데이터의 데이터 (촬영 시각, 렌즈, 조래개 값 등) == 사진 데이터에 대한 데이터(Meta data)
+> 사진 데이터  
+> 사진 데이터의 데이터 (촬영 시각, 렌즈, 조래개 값 등) == 사진 데이터에 대한 데이터(Meta data)
 
-> ##### [참고] 참조 값과 반환 값    
+> [참고] 참조 값과 반환 값    
 > 함수를 참고로 확인할 수 있음    
 > - 첫번째 결과는 참조 값을 출력  
 > - 두번째 결과는 반환 값을 출력
-
-```python
-def greeting():
-    return 'HELLO'
-print(greeting) # <function greeting at 0x10761caf0>
-print(greeting()) # HELLO
-# view의 함수에 참조값을 그대로 넘김으로써, path 함수가 내부적으로 해당 view함수를 필요할 때에 사용하기 위해서
-```
+>```python
+>def greeting():
+>    return 'HELLO'
+>print(greeting) # <function greeting at 0x10761caf0>
+>print(greeting()) # HELLO
+># view의 함수에 참조값을 그대로 넘김으로써, path 함수가 내부적으로 >해당 view함수를 필요할 때에 사용하기 위해서
+>```
 
 > **클래스도 마찬가지**  
 > Article이라는 클래스를 호출하지 않고 작성하는 이유는 ArticleForm이 해당 클래스를 필요한 시점에 사용하기 위해서  
 > +) 이 경우 인스턴스가 필요한 것이 아니라, 실제 Article 모델의 참조 값을 통하여 해당 클래스의 필드나 속성을 내부적으로 참조하기 위한 이유도 있음
-```python
-class ArticleForm(forms.ModelForm):
-    class Meta:
-        model = Article
-        fields = '__all__'
-```
+>```python
+>class ArticleForm(forms.ModelForm):
+>    class Meta:
+>        model = Article
+>        fields = '__all__'
+>```
 
 > ##### Form과 ModelForm
 > - Form과 ModelForm, 어느 것이 더 좋은 것이 아니라 역할이 다른것
