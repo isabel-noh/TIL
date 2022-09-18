@@ -216,3 +216,236 @@ Django는 직접 User Model을 참조하지 않고 `get_user_model()`을 사용�
 #### UserChangeForm
 - 사용자의 정보 및 권한을 변경하기 위해 admin Interface에서 사용되는 ModelForm
 - UserChangeForm 또한 ModelForm이기 때문에 instance 인자로 기존 User정보를 받는 구조 또한 동일 
+- 이미 이전에 CustomerUserChangeForm으로 확장했기 때문에  CustomerUserChangeForm 사용 
+```python
+# urls.py
+path('update/', views.update, name='update'),
+
+# views.py
+def update(request):
+    if request.method == 'POST':
+        form = CustomUserChangeForm(request.POST, instance=request.user) # modelForm의 첫번째 인자 - data > 여기서는 request.POST
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+
+    else:
+        form = CustomUserChangeForm(instance=request.user)
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/update.html', context)
+
+# forms.py
+class CustomUserChangeForm(UserChangeForm):
+    class Meta(UserChangeForm.Meta):
+        # django는 User을 직접 참조하는 것을 꺼림
+        model = get_user_model()
+        # 회원정보설정 페이지에서 보여주고싶은 요소를 지정 (원래 form에서는 최상위 사용자 권한 등 너무 다 보여주기 때문에 보여주고 싶은 요소만 선택지정)
+        fields = ('email','first_name','last_name',)
+```
+```django
+<!-- update.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>UPDATE_ACCOUNT</h1>
+<form action="{% url 'accounts:update' %}" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit">
+</form>
+{% endblock content %}
+
+```
+> [참고] UserChangeForm 사용시 문제점 
+> - 일반 사용자가 접근하면 안되는 정보들(fields)까지 모두 수정이 가능해짐
+>   - admin interface에서 사용하는 model form이기 때문 
+> - 따라서 UserChangeForm을 상속받아 작성해 두었던 서브 클래스 CustomerUserChangeForm에서 접근가능한 필드를 수정하여야 함
+
+### 비밀번호 변경 
+#### PasswordChangeForm
+- 사용자가 비밀번호를 변경할 수 있도록 하는 form
+- 이전 비밀번호 입력 > 비밀번호 변경 
+- SetPasswordForm(이전 비밀번호 입력 불요)를 상속받는 subclass
+```python
+# accounts/views.py
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('articles:index')
+    else:
+        form = PasswordChangeForm(request.user)
+    context = {
+        'form': form,
+    }
+    return render(request, 'accounts/change_password.html', context)
+
+# accounts/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'accounts'
+urlpatterns=[
+    ...
+    path('password/', views.change_password, name='change_password'),
+]
+
+```
+```django
+<!-- accounts/change_password.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Change_Password</h1>
+  <form action="{% url 'accounts:change_password' %}" method="POST" >
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit">
+  </form>
+{% endblock content %}
+```
+
+#### 암호 변경시 세션 무효화 방지하기
+비밀번호가 변경되면 기존 세션과 회원정보가 일치하지 않게 되어 로그인 상태가 유지되지 못함   
+##### update_session_auth_hash()
+- update_session_auth_hash(request, user)
+- 현재 요청(current request)과 새 session data가 파생될 업데이트된 사용자 객체를 가져오고, session data를 적절히 업데이트 함
+- 암호가 변경되어도 로그아웃되지 않도록 새로운 password의 session data로 session update
+
+```python
+from django.contrib.auth import update_session_auth_hash
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            #
+            update_session_auth_hash(request, form.user)
+            #
+            return redirect('articles:index')
+    else:
+        ...
+```
+
+### Limiting access to logged_in users
+로그인 사용자에 대한 접근 제한  
+1. The row way
+    - `is_authenticated` attribute
+2. The `login required` decorator
+
+#### is_authenticated
+- User model 속성 중 하나
+- 사용자가 인증되었는지 여부 확인하는 방법
+- 모든 User 인스턴스에 대해 항상 True인 읽기 전용 속성
+    - Anonymous User에 대해서는 항상 False
+- 일반적으로 request.user에서 이 속성을 사용(request.user.is_authenticated)
+- **권한 permission과는 관련이 없으며, 사용자가 활성화active상태이거나 유효한 세션valid session을 가지고 있는지도 확인하지 않음**
+> ```python
+> class AbstractBaseUser(models.Model):
+>    ...
+>    def is_authenticated(self):
+>    # Always returns True. This is a way to tell if the user has been _authenticated in templates.
+> ```
+
+- 로그인 여부에 따라 화면 구성을 달리하기 
+```django
+<!-- base.html -->
+ <!-- 로그인된 사용자에게 보여줄 요소 -->
+{% if request.user.is_authenticated %} 
+<!-- 여기 위의 request는 settings.py / TEMPLATES / OPTIONS / django.template.context_processors.request 임 -->
+    <h3>{{ user }}</h3>
+    <form action="{% url 'accounts:logout' %}" method="POST">
+        {% csrf_token %}
+     <input type="submit" value="logout">
+    </form>
+    <form action="{% url 'accounts:delete' %}" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="DELETE_ACCOUNT">
+    </form>
+    <a href="{% url 'accounts:update' %}">EDIT_ACCOUNT</a>
+<!-- 비로그인 사용자에게 보여줄 요소 -->
+{% else %}
+    <a href="{% url 'accounts:signup' %}">Signup</a>
+    <a href="{% url 'accounts:login' %}">Login</a>
+{% endif %}
+```
+- 로그인된 회원이 로그인 시도시 메인화면으로 보내기
+```python
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('articles:index')
+    ...
+```
+
+#### login_required
+- `@login_required` decorator
+- 사용자가 로그인되어있으면 정상적으로 view함수 실행
+- 로그인하지 않은 사용자의 경우 settings.py의 LOGIN_URL의 주소로 redirect
+```python
+# articles/views.py
+from django.contrib.auth.decorators import login_required 
+
+@login_required
+@require_http_methods(['GET', 'POST'])  # GET, POST만 허용
+def create(request):
+    pass
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def update(request, pk):
+    pass
+```
+
+##### next query parameter
+- /articles/create로 강제 접속 시도 -> 로그인 페이지로 리다이렉트 + url **(/accounts/login/?next=/articles/create/)**
+- 인증 성공시 사용자가 redirect되어야하는 경로는 next라는 쿼리 문자열 매개변수에 저장됨 
+- `next` query parameter : 로그인이 정상 진행되면 이전에 요청했던 주소로 redirect하기 위하여 Django가 제공하는 쿼리 스트링 파라미터
+- 해당값을 처리할지 안할지는 자유이며 별도로 처리해주지 않으면 view에 설정한 redirect경로로 이동하게 됨
+```python
+def login(request):
+    if request.user.is_authenticated:
+        return redirect('articles:index')
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        # form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            # 로그인
+            auth_login(request, form.get_user())
+            # return redirect('articles:index')
+            # ------------------------------------
+            return redirect(request.GET.get('next') or 'articles:index')
+            # ------------------------------------
+```
+- [주의사항]  
+만약 로그인 템플릿에서 form action이 작성되어 있다면 동작하지 않음  
+해당 action주소가 next 파라미터가 작성되어 있는 현재 url이 아닌 '/accounts/login/'으로 요청을 보내게 되기 때문
+
+##### 두 데코레이터로 인해 발생하는 구조적 문제
+1. 먼저 비로그인상태로 게시물 삭제 시도 
+2. delete view 함수의 @login_required로 인해 로그인 페이지로 redirect  
+http://127.0.0.1:8000/accounts/login/?next=/articles/1/delete/
+3. redirect로 이동한 페이지에서 로그인 
+4. delete view 함수의 @require_POST로 인해 405 코드 발생  
+405(Method Not Allowed) status code
+
+> **두가지 문제 발생**  
+> 1. redirect 과정에서 POST 요청 데이터 손실  
+> 2. redirect로 인한 요청은 GET 요청 메소드로만 요청됨   
+> @login_required는 GET request method를 처리할 수 있는 view 함수에서만 사용 
+
+**해결방안**  
+POST 메서드만 허용하는 delete 함수 내부에서는 is_authenticated()메서드 속성값을 활용하여 처리
+```python
+@require_POST # POST요청만 받도록 제한
+def delete(request, pk):
+    # ------------------------------------
+    if request.user.is_authenticated:
+    # ------------------------------------
+        article = Article.objects.get(pk=pk)
+        article.delete()
+    return redirect('articles:index')
+```
