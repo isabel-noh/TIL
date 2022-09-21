@@ -559,7 +559,7 @@ throw 페이지의 form이 보낸 데이터는 catch 페이지의 url에 포함�
 ```url
 http://127.0.0.1:8000/catch/?message=데이터
 ```
-> view함수의 첫번째 인자 **request**를 확인
+> 모든 요청 데이터는 view 함수의 첫번째 인자 **request**에서 확인할 수 있다
 ```python
 # views.py
 def catch(request):
