@@ -206,8 +206,8 @@ ch1 = [0] * (V + 1) # 인덱스 0, 1, 2, 3, 4까지 있는 ch1배열 선언
 ch2 = [0] * (V + 1) 
 
 for i in range(E):
-    p = arr[i*2]
-    c = arr[i*2+1]
+    p = arr[i*2] # arr[0] arr[2] arr[4]
+    c = arr[i*2+1] # arr[1] arr[3] arr[5]
 # for j in range(0, E*2, 2):  
 #     p, c = arr[j], arr[j+1]
     if ch1[p] == 0:
@@ -330,7 +330,7 @@ last = 0
 def deq(n):
     global last
     tmp = heap[1]               # 루트 백업
-    heap[1] = heal[last]        # 삭제할 노드의 키를 루트에 복사
+    heap[1] = heap[last]        # 삭제할 노드의 키를 루트에 복사
     last -= 1                   # 마지막 노드 삭제
     # 루트에 옮긴 값과 자식 비교
     p = 1
