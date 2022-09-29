@@ -227,6 +227,51 @@ for i in range(E):
     parent[c] = p
 
 ```
+
+```python
+def preorder(n):
+    if n <= N:
+        pre.append(n)
+        preorder(n*2)
+        preorder(n*2+1)
+
+def inorder(n):
+    if n <= N:
+        inorder(n*2)
+        ino.append(n)
+        inorder(n*2+1)
+
+def postorder(n):
+    if n <= N:
+        postorder(n*2)
+        postorder(n*2+1)
+        post.append(n)
+
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())   # 정점의 개수
+    E = N - 1     # 간선의 개수
+    pre = []
+    ino = []
+    post = []
+    preorder(1)
+    inorder(1)
+    postorder(1)
+    
+    tree = [0]
+    for i in range(N):
+        tree.append(max(pre[i], ino[i], post[i]))
+
+    def inorder2(n):
+        if n <= N:
+            inorder2(n*2)
+            print(tree[n], end=' ')
+            inorder2(n*2+1)
+
+    print(f'#{tc}', end=' ')
+    inorder2(1)
+    print()
+```
 ### 트리의 표현 - 연결 리스트 (Linked List)
 배열을 이용한 이진 트리의 표현의 단점을 보안하기 위하여 연결리스트를 이용하여 트리를 표혀할 수 있다. 
 - 연결리스트를 이용한 이진트리의 표현  

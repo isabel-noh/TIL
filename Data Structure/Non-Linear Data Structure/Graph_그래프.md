@@ -162,3 +162,156 @@ def Find_Set(x):
 def Union(x, y):
     p[Find_Set(y)] = Find_Set(x)
 ```
+
+#### 상호배타집합에 대한 연산의 효율을 높이는 방법 
+1. Rank를 이용한 Union
+    - 각 노드는 자신을 루트로 하는 subtree의 높이를 Rank라는 이름으로 저장 
+    - 두 집합을 합칠 때 Rank가 낮은 집합을 Rank가 높은 집합에 붙임  
+2. Path compression
+    - Find-Set을 행하는 과정에서 만나는 모든 노드들이 직접 root를 가리키도록 포인터를 바꾸어줌
+
+##### Rank를 이용한 Union
+- Make_Set()
+```python
+def Make_Set(x):
+    p[x] = x
+    rank[x] = 0
+```
+- Find_Set(x) : x를 포함하는 집합을 찾는 연산
+```python
+def Find_Set(x):
+    if x != p[x]:               # x가 root가 아닌 경우
+        p[x] = Find_Set(p[x])
+    return p[x]
+```
+- Union(x, y) : x와 y를 포함하는 두 집합을 통합하는 연산
+```python
+def Union(x, y):
+    Link(Find_Set(x), Find_Set(y))
+
+def Link(x, y): 
+    if rank[x] > rank[y]:       # rank는 tree의 높이
+        p[y] = x
+    else:
+        p[x] = y
+        if rank[x] == rank[y]:
+            rank[y] += 1
+```
+
+## MST Minimum Spanning Tree 최소 신장 트리
+- 그래프에서 최소 비용 문제 
+    1. 모든 정점을 연결하는 간선들의 가중치의 합이 최소가 되는 트리
+    2. 두 정점 사이의 최소 비용의 경로 찾기 
+- 신장 트리
+    - n개의 정점으로 이루어진 `무방향 그래프`에서 n개의 정점과 n-1개의 간선으로 이루어진 트리
+- 최소 신장 트리 Minimum Spanning Tree
+    - `무방향 가중치 그래프`에서 신장 트리를 구성하는 간선들의 가중치의 합이 최소의 신장 트리
+
+```python
+V, E = map(int, input().split())
+adjM = [[0] * (V+1) for _ in range(V+1)]
+adjL = [[] for _ in range(V+1)]
+for _ in range(E):
+    u, v, w = map(int, input().split())
+    # 인접 행렬로 저장
+    adjM[u][v] = w
+    adjM[v][u] = w  # 가중치가 있는 무방향 그래프
+    # 인접 리스트로 저장 
+    adjL[u].append((v, w))
+    adjL[v].append((u, w))
+
+```
+
+### Prim Algorithm
+- 하나의 정점에서 연결된 간선들 중에 하나씩 선택하면서 MST를 만들어가는 방식
+    1. 임의 정점 하나를 선택해서 시작
+    2. 선택한 정점과 인접하는 정점들 중의 최소 비용의 간선이 존재하는 정점을 선택
+    3. 모든 정점이 선택될 때까지 1. 2. 과정을 반복 
+
+- 서로소인 2개의 집합(2 disjoint sets) 정보를 유지
+    - 트리 정점들(tree vertices) - MST를 만들기 위해 선택된 정점들
+    - 비트리 정점들(nontree vertices) - 선택되지 않은 정점들 
+
+
+```python
+def prim1(r, V):
+    mst = [0] * (V+1)  # MST 포함 여부 1 / 0
+    key = [9999] * (V+1)  # 가중치를 최대값이상으로 초기화
+    key[r] = 0    # 시작 정점의 key
+    for _ in range(V):  # V+1 개 정점 중 V개 선택 
+        u = 0         # mst에 포함되지 않은 정점
+        minV = 10000  
+        for i in range(V+1):
+            if mst[i] == 0 and key[i] < minV: # 아직 mst가 아니면서 i번째의 키값이 minV보다 작으면 
+                u = i
+                minV = key[i] # minV를 최소값으로
+        mst[u] = 1    # mst에 U 추가
+        for v in range(V+1):
+            if mst[v] == 0 and adjM[u][v] > 0: 
+                key[v] = min(key[v], adjM[u][v])
+    return sum(key)          # 가중치의 합
+
+V, E = map(int,input().split())
+visited = [i for i in range(V+1)]
+adjM = [[0] * (V+1) for _ in range(V+1)]
+for i in range(E):
+    u, v, w = map(int, input().split())
+    adjM[u][v] = w
+    adjM[v][u] = w  
+prim1(0, V)
+```
+```python
+def prim2(r, V):
+    mst = [0] * (V+1)   # mst 포함 여부
+    mst[r] = 1          # 시작점 mst 포함
+    s = 0               # 가중치의 합
+    for _ in range(V): 
+        u = 0
+        minV = 10000
+        for i in range(V+1):
+            if mst[i] == 1:    # mst에 포함된 정점일 경우 인접 정점 확인
+                for j in range(V+1): 
+                    if adjM[i][j] > 0 and mst[j] == 0 and minV > adjM[i][j]:  # j는 i와 인접한 정점, j는 mst에 아직 포함 X, 인접한 정점 중에 가중치가 minimum인 경우 
+                        u = j   # mst에 넣을 u로 지정
+                        minV = adjM[i][j] # minimumV 지정
+        s += minV
+        mst[u] = 1
+    return s
+```
+
+### Kruskal Algorithm
+간선을 하나씩 선택해서 MST를 찾는 알고리즘  
+1. 최초, 모든 간선을 가중치에 따라 오름차순으로 정렬
+2. 가중치가 가장 낮은 간선부터 선택하면서 트리를 증가시킴
+    - 사이클이 존재하면 다음으로 가중치가 낮은 간선 선택
+3. n-1개의 간선이 선택될 때까지 2를 반복
+
+#### 알고리즘
+```python
+V, E = map(int, input().split())
+edge = []
+for _ in range(E):
+    u, v, w = map(int, input().split())
+    edge.append([u, v, w])
+edge.sort(key=lambda x:x[2])
+rep = [i for i in range(V+1)]
+
+def find_set(x):
+    while rep[x] != x:
+        x = rep[x]
+    return x
+def union(x, y):
+    rep[find_set(y)] = find_set(x)   # y의 대표원소를 찾아서 x의 대표원소로 바꿈
+
+count = 0   # 선택한 정점의 개수 
+total = 0   # MST 가중치의 합 
+
+for u, v, w in edge:
+    if find_set(u) != find_set(v):
+        union(u, v)
+        count += 1
+        total += w
+    if count == V:
+        break
+print(total)
+```
