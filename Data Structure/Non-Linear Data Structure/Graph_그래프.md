@@ -315,3 +315,60 @@ for u, v, w in edge:
         break
 print(total)
 ```
+
+## 최단 경로
+간선의 가중치가 있는 그래프에서 두 정점 사이의 경로들 중에 간선의 가중치의 합이 최소인 경로  
+- 하나의 시작정점에서 끝정점까지의 최단 경로
+    - 다익스트라 알고리즘 : 음의 가중치를 허용하지 않음
+    - 벨만 포드 알고리즘 : 음의 가중치 허용
+- 모든 정점들에 대한 최단 경로
+    - 플로이드 워샬 알고리즘
+
+### Dijkstra Algorithm
+시작 정점에서 거리가 최소인 정점을 선택해 나가면서 최단 경로를 구하는 방식  
+- 시작 정점(s)에서 끝 정점(t)까지의 최단 경로에 정점 x가 존재  
+- 최단경로는 s에서 x까지 최단 경로와 x에서 t까지의 최단 경로로 구성됨
+- MST의 prim algorithm과 유사
+
+```python
+s : 시작 정점, t : 끝 정점, A : 인접 행렬, D : 거리
+V : 정점 집합, U : 선택된 정점의 집합
+def Dijkstra(s, A, D):
+    U = {s}
+    for 모든 정점 v:
+        D[v] = A[s][v]
+    while U != V:
+        U에 포함되어 있지 않으면서 D[w]가 최소인 정점 w 선택
+        U.append(w)
+        
+        for w에 인접한 모든 정점 v:
+            D[v] = min(D[v], D[w]+A[w][v]) # D[w]+A[w][v] : w를 거쳐서 v로 가는 비용 
+            # 기존의 v로 가는 비용과, w를 거쳐서 v로 가는 새로 찾은 비용을 비교해서 더 적은 것을 선택
+```
+```python
+def dijkstra(N, X, adj, d):
+    for i in range(N+1):
+        d[i] = adj[X][i]
+    U = [X]
+    for _ in range(N-1):    # N개의 정점 중에서 출발점을 제외한 정점
+        w = 0
+        for i in range(1, 1+N):
+            if (i not in U) and d[i] < d[w]:  # 남은 노드 중에서 비용이 최소인 w
+                w = i
+        U.append(w)
+        for i in range(1, 1+N):
+            if 0 < adj[w][i] < 1000000 : 
+                d[v] = min(d[v], d[w]+adj[w][v])
+T = int(input())
+for tc in range(1, T+1):
+    N, M, X = map(int, input().split())
+    ajd1 = [[1000000] * N for _ in range(N+1)]
+    for i in range(N+1):
+        adj1[i][i] = 0
+        for _ in range(M):
+            x, y, c = map(int, input().split())
+            adj1[x][y] = c
+            dout = [0] * (N+1)
+            dijkstra(N, X, adj1, dout)
+            print(dout)
+```
