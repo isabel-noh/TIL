@@ -62,9 +62,10 @@ adjM = [[0]* (V+1) for _ in range(V+1)]
 adjList = [[] for _ in range(V+1)]
 for i in range(E):
     n1, n2 = arr[i*2], arr[i*2+1]
+    # 인접 행렬
     adjM[n1][n2] = 1
     adjM[n2][n1] = 1   # 방향이 없는 경우에만 
-
+    # 인접 리스트
     adjList[n1].append(n2)
     adjList[n2].append(n1)
 
@@ -94,7 +95,7 @@ DFS_Recursive(G, v):
 2. 정점에 연결되어 있는 앞으로 갈 길을 stack에 저장해놓고 하나씩 pop해서 이동하는 방법
 ```python
 s = [] # stack
-visited = []
+visited = [0] * (V+1)
 def DFS(v):
     push(s, v)   # 시작하는 정점, 
     while not isEmpty(s):
@@ -353,7 +354,7 @@ def dijkstra(N, X, adj, d):
     for _ in range(N-1):    # N개의 정점 중에서 출발점을 제외한 정점
         w = 0
         for i in range(1, 1+N):
-            if (i not in U) and d[i] < d[w]:  # 남은 노드 중에서 비용이 최소인 w
+            if (i not in U) and d[i] < d[w]:  # 남은 노드 중에서 비용이 최소인 w`
                 w = i
         U.append(w)
         for i in range(1, 1+N):
