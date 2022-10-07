@@ -213,10 +213,60 @@ CREATE TABLE table_name(
 
 ## ALTER TABLE
 Modify the structure of an existing table  
-...
+기존 테이블의 구조를 수정(변경)  
+```sql
+-- 1. Rename a table(테이블 이름 변경)
+ALTER TABLE table_name RENAME TO new_table_name;
+-- 2. Rename a column(컬럼 이름 변경)
+ALTER TABLE table_name RENAME COLUMN column_name TO new_column_name;
+-- 3. Add a new column to a table(테이블에 컬럼 추가)
+ALTER TABLE table_name ADD COLUMN column_definition;
+-- 4. Delete a column (컬럼 삭제)
+ALTER TABLE table_name DROP COLUMN column_name;
+```
+#### ALTER TABLE ADD COLUMN  
+Add a new column to a table 
+```sql
+ALTER TABLE table_name 
+ADD COLUMN column_name TEXT(/INTEGER/...) NOT NULL(constraints);
+```
+
+- 만약 기존 데이터가 있을 경우, 에러 발생  
+`Cannot add NOT NULL column with default value NULL`
+- 이전에 이미 저장된 데이터들은 새롭게 추가되는 컬럼에 값이 없기 때문에 NULL이 작성됨  
+- 새로 추가되는 컬럼에 NOT NULL 제약조건이 있기 때문에 기본 값 없이는 추가될 수 없다는 에러가 발생하게 됨
+- **DEFAULT 제약조건을 사용하여 해결**
+    - column_name 컬럼이 추가되면서 기존에 있던 데이터들의 column_name 컬럼 값은 'no column_name'이 됨
+```sql
+ALTER TABLE table_name 
+ADD COLUMN column_name TEXT NOT NULL DEFAULT 'no column_name';
+-- e.g.) ALTER TABLE new_contacts  ADD COLUMN address TEXT NOT NULL DEFAULT 'no address';
+```
+> [참고] DEFAULT 제약조건
+> - column 제약조건 중 하나
+> - 데이터를 추가할 때 값을 생략할 시에 기본 값을 설정할 수 있음
+
+#### ALTER TABLE DROP COLUMN 
+Delete a column
+```sql
+ALTER TABLE table_name DROP COLUMN column_name;
+```
+- 삭제하지 못하는 경우  
+    - 컬럼이 다른 부분에서 참조되는 경우 : `FOREIGN KEY(외래 키)제약조건`에서 사용되는 경우
+    - `PRIMARY KEY`인 경우
+    - `UNIQUE 제약조건`이 있는 경우
+        - Cannot drop UNIQUE column: "email"
+
 
 ## DROP TABLE
-...
+Remove a table from the database  
+```sql
+DROP TABLE table_name;
+```
+존재하지 않는 테이블을 제거하면 SQLite에서 오류 발생 `no such table: table_name`
+- 한 번에 하나의 테이블만 삭제할 수 있음
+- 여러 테이블을 제거하려면 여러 DROP TABLE문을 실행하여야 함
+- [**주의**] DROP TABLE문은 실행취소 혹은 복구할 수 없음  
 
 # DML
 DML을 통해 데이터 조작하기(CRUD)
@@ -553,3 +603,77 @@ VALUES (value1, value2, ...);
 3. VALUES 키워드 뒤에 쉼표로 구분된 값 목록을 추가 
     - 컬럼 목록을 생략하는 경우, 값 목록의 모든 컬럼에 대한 값을 지정해야 함
     - 값 목록의 개수는 컬럼 목록의 개수와 같아야 함
+
+---
+- 단일 행 삽입하기
+```sql
+INSERT INTO classmates (name, age, address) 
+VALUES ('홍길동', 20, '강남구');
+
+INSERT INTO classmates VALUES ('홍길동', 20, '강남구');
+```
+- 여러 행 삽입하기
+```sql
+INSERT INTO classmates 
+VALUES 
+    ('홍길동', 20, '강남구'),
+    ('홍영민', 24, '관악구'),
+    ('홍상수', 33, '송파구'),
+    ('홍지원', 22, '광진구');
+```
+
+### UPDATE Statement
+Update existing rows in a table.  
+테이블에 있는 기존 행의 데이터를 업데이트  
+```sql
+UPDATE table_name
+SET column_1 = new_value_1,
+    column_2 = new_value_2
+WHERE
+    search_condition;
+```
+1. UPDATE 절 이후 업데이트할 테이블 지정 
+2. SET 절에서 테이블의 각 컬럼에 대해 새 값 설정
+3. WHERE 절의 조건을 사용하여 업데이트할 행을 지정  
+    - WHERE절은 선택 사항이며, `생략`하면 UPDATE 문은 테이블의 `모든 행에 있는 데이터를 수정함`
+4. 선택적으로 ORDER BY 및 LIMIT 절을 사용하여 업데이트할 행의 수를 지정할 수 있음  
+
+---
+- 2번 데이터의 이름을 '김철수한무두루미', 주소를 '제주도'로 수정하기
+```sql
+UPDATE users 
+SET first_name='김철수한무두루미', 
+    address='제주도' 
+WHERE rowid=2;
+```
+
+### DELETE statement
+Delete rows from a table  
+테이블에서 행 제거  
+테이블의 한 행, 여러 행, 모든 행을 삭제할 수 있음
+```sql
+DELETE FROM table_name
+WHERE search_condition;
+```
+1. DELETE FROM 키워드 뒤에 행을 제거하려는 테이블의 이름을 지정 
+2. WHERE 절에 검색조건을 추가하여 제거할 행을 식별
+    - WHERE 절은 선택사항이며, `생략`하면 DELETE문은 `테이블의 모든 행을 삭제`
+3. 선택적으로 ORDER BY 및 LIMIT 절을 사용하여 삭제할 행의 수를 지정할 수 있음  
+
+---
+- 5번 데이터 삭제하기
+```sql
+DELETE FROM users WHERE rowid=5;
+```
+- 삭제된 것 확인하기
+```sql
+SELECT rowid, * FROM users;
+```
+- 이름에 '영'이 포함되는 데이터 삭제하기 
+```sql
+DELETE FROM users WHERE first_name LIKE '%영%' OR last_name LIKE '%영%';
+```
+- 테이블의 모든 데이터 삭제하기
+```sql
+DELETE FROM users;
+```
