@@ -223,3 +223,32 @@ django.views.decorators.http의 데코레이터를 활용하여 **요청 메서�
 > ##### [참고] 405 Not Allowed Method  
 > 요청 방법이 서버에 전달되었으나 사용 불가능한 상태
 
+
+
+##### forms에서 widget사용하기
+```python
+from django import forms
+from .models import Movie
+
+
+GENRE_CHOICES = [
+    ('comedy', '코미디'),
+    ('horror', '공포'),
+    ('romance', '로맨스'),
+]
+
+class MovieForm(forms.ModelForm):
+
+    class Meta:
+        model = Movie
+        fields = '__all__'
+        widgets = {
+            'title' : forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Title'}),
+            'audience' : forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Audience'}),
+            'release_date' : forms.DateInput(attrs={'class': 'form-control', 'type':'date'}),
+            'genre' : forms.Select(attrs={'class': 'form-control'}, choices=GENRE_CHOICES),
+            'score' : forms.NumberInput(attrs={'class': 'form-control', 'type':'number', 'step':'0.5', 'min':'0.0', 'max':'5.0', 'placeholder':'Score'}),
+            'poster_url' : forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Poster url'}),
+            'description' : forms.Textarea(attrs={'class': 'form-control', 'placeholder':'Description', 'rows':5}),
+        }
+```
