@@ -74,3 +74,4 @@ User.objects.filter(age__gte=30).values('first_name', 'age')
 ```python
 User.objects.filter(age__gte=30, balance__gt=500000).values('first_name', 'age', 'balance')
 ```
+

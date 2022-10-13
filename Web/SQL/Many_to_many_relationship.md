@@ -269,7 +269,8 @@ class Article(models.Model):
     title = models.CharField(max_length=10)
     content = models.TextField()
 ```
-makemigrations 이후 에러 발생! 
+---
+**makemigrations 이후 에러 발생!**
 ```python
 ERROR
 articles.Article.likes_users: (fields.E304) Reverse accessor for 'articles.Article.likes_users' clashes with reverse accessor for 'articles.Article.user'.
@@ -292,3 +293,159 @@ articles.Article.user: (fields.E304) Reverse accessor for 'articles.Article.user
     - user.article_set - 유저가 작성한 게시글(역참조) N:1 
     - article.like_users - 게시글을 좋아요 한 유저 M:N
     - user.like_articles - 유저가 좋아요 한 게시글(역참조) M:N
+
+### 구현하기
+- url 및 view 함수 작성
+```python
+# urls.py
+from django.urls import path
+from . import views
+
+app_name = 'articles'
+urlpatterns =[
+    ..., 
+    # 추가
+    path('<int:article_pk>/likes/', views.likes, name='likes')
+]
+```
+```python
+# views.py
+def likes(request, article_pk):
+    # Article 중에서 게시물과 pk가 같은 게시물을 article에 저장
+    article = Article.objects.get(pk=article_pk)
+    # 현재 게시글의 좋아요 목록에 요청한 유저가 있는지 없는지를 확인
+    if request.user in article.likes_users.all():
+    # if article.likes_users.filter(pk=request.user.pk).exists():
+        # 좋아요 취소(remove)
+        article.likes_users.remove(request.user)
+    else:
+        # 좋아요 추가(add)
+        article.likes_users.add(request.user)
+    return redirect('articles:index')
+```
+- index template에 각 게시글에 좋아요 버튼 출력
+```django
+<!-- index.html -->
+<div>
+      <form action="{% url 'articles:likes' article.pk %}" method="POST">
+        {% csrf_token %}
+        <!-- 현재 user가 좋아요 한 유저 안에 있다면 좋아요 취소 버튼 출력 -->
+        {% if request.user in article.likes_users.all %}
+          <input type="submit" value="좋아요 취소">
+          <!-- 그렇지 않으면 좋아요 버튼 출력 -->
+        {% else %}
+          <input type="submit" value="좋아요">
+        {% endif %}
+      </form>
+    </div>
+```
+
+#### .exists()
+QuerySet에 결과가 포함되어 있으면 True를 반환하고 그렇지 않으면 False를 반환  
+특히 큰 QuerySet에 있는 특정 개체의 존재와 관련된 검색에 유용  
+
+---
+
+- decorator 및 is_authenticated 추가
+```python
+from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
+
+@require_POST # post요청만 받을거니까
+def likes(request, article_pk):
+    # 로그인 한 유저만 사용하게끔
+    if request.user.is_authenticated:
+        article = Article.objects.get(pk=article_pk)
+        # 현재 게시글의 좋아요 목록에 요청한 유저가 있는지 없는지를 확인
+        # if request.user in article.likes_users.all():
+        if article.likes_users.filter(pk=request.user.pk).exists():
+            # 좋아요 취소(remove)
+            article.likes_users.remove(request.user)
+        else:
+            # 좋아요 추가(add)
+            article.likes_users.add(request.user)
+        return redirect('articles:index')
+    # 로그인 안 한 유저가 좋아요 누르면 로그인 페이지로 redirect
+    return redirect('accounts:login')
+```
+
+## PROFILE 구현
+- url 및 view 함수 작성
+```python
+# urls.py
+from django.urls import path
+from . import views
+
+app_name = 'accounts'
+urlpatterns = [
+    ...,
+    path('profile/<str:username>', views.profile, name='profile'),
+]
+```
+```python
+# views.py
+# Django에서는 from .models import User로 직접 참조하는 것이 아니라 get_user_model을 활용하는 것을 권장함
+from django.contrib.auth import get_user_model
+
+# profile
+def profile(request, username):
+    User = get_user_model()
+    person = User.objects.get(username=username)
+    context = {
+        'person':person,
+    }
+    return render (request, 'accounts/profile.html', context)
+```
+- profile template 작성
+```django
+{% extends 'base.html' %}
+
+{% block content %}
+<h1> {{ person.username }}의 프로필</h1>
+{% comment %} 작성한 게시글 목록 {% endcomment %}
+{% for article in person.article_set.all %}
+    <div>
+        <p>{{ article.title }}</p>
+    </div>
+{% endfor %}
+{% comment %} 작성한 댓글 목록 {% endcomment %}
+<h1> {{ person.username }}이 작성한 댓글 목록</h1>
+{% for comment in person.comment_set.all %}
+    <div>{{ comment.content }}</div>
+{% endfor %}
+{% comment %} 좋아요한 게시글 목록 - related_name 참고 {% endcomment %}
+<h1> {{ person.username }}이 좋아요한 게시글 목록</h1>
+{% for article in person.like_articles.all %}
+    <div>{{ article.title }}</div>
+{% endfor %}
+<a href="{% url 'articles:index' %}">뒤로 가기</a>
+{% endblock content %}
+```
+- profile template으로 이동하는 하이퍼링크 작성
+```django
+<!-- base.html -->
+<a href={% url 'accounts:profile' user.username%} >내 프로필 </a>
+```
+```django
+<!-- articles/index.html -->
+    <a href="{% url 'accounts:profile' article.user.username%}"><b>작성자 : {{ article.user }}</b></a> 
+    {% comment %} user까지만 써도 되고 article.user.username까지 써줘도 됨 {% endcomment %}
+    <a href="{% url 'accounts:profile' article.user%}"><b>작성자 : {{ article.user }}</b></a>
+```
+
+## FOLLOW 기능 구현
+### 모델 관계 설정
+- AbstractUser을 상속받은 User 모델 커스터마이징
+    - ManyToManyField 작성 및 Migration 진행
+```python
+# accounts/models.py
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+# Create your models here.
+class User(AbstractUser):
+    # pass
+    followings = models.ManyToManyField('self', symmetrical=False, related_name='followers')
+```
+- ManyToManyField에서 'self' 자기 자신을 참조할 때는 symmetrical 인자(대칭 여부)를 넣어줘야 함. 
+- 역참조시 사용할 이름 related_name 작성  
