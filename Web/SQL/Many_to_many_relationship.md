@@ -449,3 +449,30 @@ class User(AbstractUser):
 ```
 - ManyToManyField에서 'self' 자기 자신을 참조할 때는 symmetrical 인자(대칭 여부)를 넣어줘야 함. 
 - 역참조시 사용할 이름 related_name 작성  
+```python
+# accounts/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'accounts'
+urlpatterns = [
+    ...,
+    path('<int:user_pk>/follow/', views.follow, name='follow'),
+]
+```
+```python
+# accounts/views.py
+def follow(request, user_pk):
+    User = get_user_model()  # user model 참조
+    target = User.objects.get(pk=user_pk) # 팔로우 대상
+    
+    if request.user != target:
+        if request.user in target.followers.all(): # 팔로우하려는 사람의 팔로워 리스트 안에 요청하는 user가 있는지
+        #  unfollow
+            target.followers.remove(request.user)
+        else:
+            # follow
+            target.followers.add(request.user)
+    return redirect('accounts:profile', target.username)
+    
+```

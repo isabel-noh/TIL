@@ -75,3 +75,32 @@ User.objects.filter(age__gte=30).values('first_name', 'age')
 User.objects.filter(age__gte=30, balance__gt=500000).values('first_name', 'age', 'balance')
 ```
 
+-------
+# Improve Query
+Query 개선하기 
+- annotate
+- select_related
+- prefetch_related
+## annotate
+```python
+    articles = Article.objects.annotate(Count('comment')).order_by('-pk')
+```
+## select_related
+1:1 또는 1:N 참조 관계에서 사용  
+SQL의 INNER JOIN을 사용하여 참조하는 테이블의 일부를 가져오고, SELECT FROM을 사용하여 관련된 필드들을 가져옴  
+```python
+    articles = Article.objects.select_related('user').order_by('-pk')
+```
+
+## prefetch_related
+N:1 역참조 관계에서 사용 
+```python
+    articles = Article.objects.prefetch_related('comment_set').order_by('-pk')
+```
+
+#### 예시
+```python
+    articles = Article.objects.prefetch_related(
+        Prefetch('comment_set', queryset=Comment.objects.select_related('user'))
+    ).order_by('-pk')
+```
