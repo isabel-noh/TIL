@@ -828,18 +828,101 @@ returnObject = () => ({key: 'value'})
 
 ### 즉시 실행 함수(IIFE, Immediately Invoked Function Expression)
 - 선언과 동시에 실행되는 함수
-- 
+- 함수의 선언 끝에 '()'를 추가하여 선언되자마자 실행하는 형태
+- '()'에 값을 넣어 인자로 넘겨줄 수 있음 
+- 즉시 실행 함수는 선언과 동시에 실행되기 때문에 같은 함수를 다시 호출할 수 없음 
+- 이러한 특징으로 살려 초기화 부분에 많이 사용
+- 일회성 함수이므로 익명함수로 사용하는 것이 일반적
+```js
+(function (num) {return num ** 3 })(2)  // 8
+(num => num ** 3)(2)  // 8
+```
 
 
 # Array
+- Javascript의 데이터 타입 중 참조 타입에 해당하는 타입은 array와 object이며 객체라고 말함  
+- 객체는 속성들의 모음(collection)
+- 객체 안쪽의 속성들은 메모리에 할당되어있고 해당 객체는 메모리의 시작 주소값을 가리키고 있는 형태로 이루어져 있음 
+## 배열
+- 키와 속성들을 담고 있는 참조 타입의 객체 object
+- 순서를 보장함
+- 주로 대괄호를 이용하여 생성하고, 0을 포함한 양의 정수 인덱스로 특정 값에 접근 가능 (python 처럼 arr[-1] 등의 형식으로 접근 불가)
+- 배열의 길이는 array.length 형태로 접근 가능 (array[array.length-1] 등의 방식으로는 접근 가능 )
+```js
+const numbers = [1, 2, 3, 4, 5]
 
+console.log(numbers[0])     // 1
+console.log(numbers[-1])    // undefined
+console.log(numbers.length) // 5
 
-
+console.log(numbers[numbers.length-1])  // 5
+console.log(numbers[numbers.length-2])  // 4
+console.log(numbers[numbers.length-3])  // 3
+console.log(numbers[numbers.length-4])  // 2
+console.log(numbers[numbers.length-5])  // 1
+```
 ## Array Helper Methods
-### Array Helper Methods - forEach
+- array.reserve()
+원본 배열 요소들의 순서를 반대로 정렬
+```js
+const numbers = [1, 2, 3, 4, 5]
+numbers.reserve()
+```
+- array.push()  
+배열의 가장 뒤에 오소 추가
+- array.pop()  
+배열의 마지막 요소 제거
+```js
+const numbers = [1, 2, 3, 4, 5]
+numbers.push(100)
+console.log(numbers)    // [1, 2, 3, 4, 5, 100]
+numbers.pop()
+console.log(numbers)    // [1, 2, 3, 4, 5]
+```
+- array.unshift()  
+배열의 가장 앞에 요소를 추가
+- array.shift()  
+배열의 가장 앞에 요소를 제거
+- array.includes(value)  
+배열에 특정 값이 존재하는지 판별 후 참/거짓 반환 
+- array.indexOf(value)  
+배열의 특정 값이 존재하는지 확인 후, 가장 첫번째로 찾은 요소의 인덱스를 반환    
+해당 값이 없을 경우 -1 반환
+```js
+const numbers = [1, 2, 3, 4, 5]
+let result
+result = numbers.indexOf(3)  // 2
+result = numbers.indexOf(100)  // -1
+```
+- array.join([separator])  
+배열의 모든 요소를 연결하여 반환  
+separator(구분자)는 선택적으로 지정 가능하며, 생략시 쉼표(,)가 기본  
+```js
+const numbers = [1, 2, 3, 4, 5]
+let result
 
-element는 필수 인자,   
-index, 맨 뒤의 array는 선택 인자
+result = numbers.join()  // 1,2,3,4,5
+result = numbers.join('')  // 12345
+result = numbers.join(' ')  // 1 2 3 4 5
+result = numbers.join('-')  // 1-2-3-4-5
+```
+## Array Helper Methods
+배열을 순회하며 특정 로직을 수행하는 메서드  
+메서드 호출 시 인자로 `callback 함수`를 받는 것이 특징  
+callback 함수 : 어떤 함수의 내부에서 실행될 목적으로 인자로 넘겨받는 함수  
+
+### Array Helper Methods - forEach
+```js
+array.forEach((element, index, array) =? {
+    // do something
+})
+```
+- 인자로 주어지는 함수(콜백함수)를 배열의 각 요소에 대해 한 번 씩 실행
+    - element : 배열의 요소
+    - index : 배열 요소의 인덱스
+    - array : 배열 자체 
+- return 없음
+- element는 필수 인자, index, 맨 뒤의 array는 선택 인자
 ```js
 const colors = ['red', 'blue', 'white']
 
@@ -860,7 +943,14 @@ colors.forEach((color) => { console.log(color) } )
 ```
 
 ### Array Helper Methods - map
-새로운 배열 반환  
+```js
+array.map((element, index, array) -> {
+    // do something
+})
+```
+- 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행
+- 콜백 함수의 반환 값을 요소로 하는 새로운 배열 반환 
+- 기존 배열 전체를 다른 형태로 바꿀 때 유용  
 - forEach + return 이라고 생각해보기
 
 ```js
@@ -881,7 +971,14 @@ const newArray3 = numbers.map( (number) => number * 2 )
 console.log(newArray3)
 ```
 ### Array Helper Methods - filter
-콜백 함수의 반호나 값이 참인 요소들만 모아서 새로운 배열 반환  
+```js
+array.filter((element, index, array) =>{
+    // do something
+})
+```
+- 배열의 각 요소에 대해 콜백 함수를 한번씩 실행
+- 콜백 함수의 반호나 값이 참인 요소들만 모아서 새로운 배열 반환  
+- 기존 배열의 요소들을 필터링할 때 유용
 ```js
 const products = [
     { name: 'cucmber', type : 'vegetable' },
@@ -908,12 +1005,21 @@ console.log(newArray2)
 ```
 
 ### Array Helper Methods - reduce
-인자로 주어지는 함수(콜백함수)를 배열의 각 요소에 대해 한 번씩 실행해서, 하나의 결과 값을 반환  
-배열을 하나의 값으로 계산하는 동작이 필요할 때 사용(총합, 평균 등)  
+```js
+array.reduce((acc, element, index, array) => {
+    // do something
+}, initialValue)
+```
+- 인자로 주어지는 함수(콜백함수)를 배열의 각 요소에 대해 한 번씩 실행해서, 하나의 결과 값을 반환  
+- 배열을 하나의 값으로 계산하는 동작이 필요할 때 사용(총합, 평균 등)  
 - reduce 메서드의 주요 매개변수
     - acc
         - 이전 callback 함수의 반환값이 누적되는 변수
     - initialValue(optional)
+        - 최초 callback함수 호출시 acc에 할당되는 값, default값은 배열의 첫번째값
+- reduce의 첫번째 매개변수인 콜백함수의 첫번째 매개변수('acc')는 누적된 값
+- reduce의 두번째 매개변수인 'initialValue'는 누적될 값의 초기값, 지정하지 않을 시 첫번째 요소의 값이 됨  
+- **빈 배열의 경우 initialValue를 제공하지 않으면 에러발생** 
 ```js
 const numbers = [90, 80, 70, 100]
 
@@ -934,8 +1040,14 @@ console.log(sumNumb)
 ```
 
 ### Array Helper Methods - find
-콜백 함수의 반환 값이 참이면, 조건을 만족하는 첫번째 요소를 반환 
-찾는 값이 배열에 없으면 undefined를 반환
+```js
+array.find((element, index, array)) {
+    // do something
+}
+```
+- 배열의 각 요소에 대해 콜백 함수를 한 번씩 실행
+- 콜백 함수의 반환 값이 참이면, 조건을 만족하는 첫번째 요소를 반환 
+- 찾는 값이 배열에 없으면 undefined를 반환
 ```js
 const avengers = [
     { name: 'Tony Stark', age: 45},
@@ -950,10 +1062,15 @@ const avenger = avengers.find((avenger) => {
 console.log(avenger)
 ```
 
-### Array Helper Methods - sum
-배열의 요소 중 하나라도 주어진 판별 함수를 통과하면 참을 반환  
-모든 요소가 통과하지 못하면 거짓 반환  
-빈 배열은 항상 false 반환  
+### Array Helper Methods - some
+```js
+array.some((element, index, array)) => {
+    // do something
+}
+```
+- 배열의 요소 중 하나라도 주어진 판별 함수를 통과하면 참을 반환  
+- 모든 요소가 통과하지 못하면 거짓 반환  
+- 빈 배열은 항상 false 반환  
 ```js
 const arr = [1, 2, 3, 4, 5]
 
@@ -965,9 +1082,14 @@ const result = arr.some((elem) => elem % 2 === 0)
 console.log(result)         // true
 ```
 ### Array Helper Methods - every
-배열의 모든 요소가 주어진 판별 함수를 통과하면 참을 반환  
-하나의 요소라도 통과하지 못하면 거짓 반환  
-빈 배열은 항상 true 반환  
+```js
+array.every((element, index, array)) => {
+    // do something
+}
+```
+- 배열의 모든 요소가 주어진 판별 함수를 통과하면 참을 반환  
+- 하나의 요소라도 통과하지 못하면 거짓 반환  
+- 빈 배열은 항상 true 반환  
 ```js
 const arr = [1, 2, 3, 4, 5]
 const result = arr.every(function(elem) {
@@ -1001,7 +1123,8 @@ console.log(myInfo["samsung products"].galaxy)
 ```
 
 ## 객체 관련 문법
-### 1. 속성명 축약
+### 1. 속성명 
+객체를 정의할 때 key와 할당하는 변수의 이름이 같으면 예시처럼 축약 가능
 ```js
 var books = ['learning javascript', 'learning python']
 var magazines = ['vogue', 'science']
