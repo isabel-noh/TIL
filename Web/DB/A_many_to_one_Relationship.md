@@ -130,4 +130,9 @@ admin.site.register(Comment)
 
 # N:1(Article-User)
 
+
 # N:1(Comment-User)
+
+- `save(commit=False)`  
+아직 데이터베이스에 저장되지 않은 인스턴스를 반환  
+저장하기 전에 객체에 대한 사용자 지정 처리를 수행할 때 유용
