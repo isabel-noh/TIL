@@ -116,7 +116,7 @@ axios.get(
 #### MVVM Pattern
 - 소프트웨어 아키텍처 패턴의 일종
 - 마크업 언어로 구현하는 그래픽 사용자 인터페이스(view)의 개발을 Backend(model)로부터 분리시켜 view가 어느 특정한 모델 플랫폼에 종속되지 않도록 함
-![mvvm](MVVM.png)
+![mvvm](https://user-images.githubusercontent.com/89833631/198959595-ec2d0394-c0d2-4224-8714-362c69d3394a.png)
 
 - `View` - 우리 눈에 보이는 부분 `DOM`
 - `Model` - 실제 데이터 `JSON`
