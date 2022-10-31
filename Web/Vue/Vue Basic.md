@@ -274,7 +274,7 @@ const app = new Vue({
 - directive의 역할은 `표현식의 값이 변경될 때 반응적으로 DOM에 적용하는 것`
 
 #### Directives 기본 구성
-![directives](directives.png)
+![directives](https://user-images.githubusercontent.com/89833631/198959183-692dc257-6552-4e95-8f60-9b97f6371e70.png)
 - `:`을 통해 전달인자를 받을 수 있음
 - `.`으로 표시되는 특수 접미사 - directive를 특별한 방법으로 바인딩해야 함
 ```html
@@ -308,3 +308,4 @@ const app = new Vue({
 - v-html
     - RAW HTML을 표현할 수 있는 방법
     - 단, `사용자가 입력하거나 제공하는 컨텐츠에는 절대 사용 금지`
+    - XXS 공격 참고
