@@ -213,27 +213,27 @@ const memeber3 = new Member('isaac', 21, 2022654321)
 print method 실행시 Vue instance의 data 내 message 출력
 콘솔창에서 app.print() 실행-->
 <body>
-    <script>
-        const app = new Vue({
-            el: '...',
-            data: {...},
-            methods: {
-                    print: function () {
-                        console.log(this.message)  //여기서 this는 위의 const app 이라는 vue 객체를 가리킴
-                        console.log(this.$data.message)  // View에 정해진 속성값을 의미함. 다른 이름과 겹치지 않도록 설정함. 내부적으로 이용하고 있는 속성값을 의미함.
-                    },
-                    // 하나의 데이터를 재사용
-                    /*method를 호출하여 data 변경 가능 - 객체 내 bye method 정의
-                    print method 실행시 Vue instance의 data 내 message 변경 
-                    - 콘솔창에서 app.bye()실행 
-                        - DOM에 변경된 결과를 바로 반영
-                        - Vue의 강력한 반응성(reactivity)*/
-                    bye: function () {
-                        this.message = 'Bye, Vue!' // this.message를 Bye, Vue로 변경
-                    },
-            }
+  <script>
+      const app = new Vue({
+          el: '...',
+          data: {...},
+          methods: {
+            print: function () {
+              console.log(this.message)  //여기서 this는 위의 const app 이라는 vue 객체를 가리킴
+              console.log(this.$data.message)  // View에 정해진 속성값을 의미함. 다른 이름과 겹치지 않도록 설정함. 내부적으로 이용하고 있는 속성값을 의미함.
+            },
+              // 하나의 데이터를 재사용
+              /*method를 호출하여 data 변경 가능 - 객체 내 bye method 정의
+              print method 실행시 Vue instance의 data 내 message 변경 
+              - 콘솔창에서 app.bye()실행 
+                  - DOM에 변경된 결과를 바로 반영
+                  - Vue의 강력한 반응성(reactivity)*/
+            bye: function () {
+                  this.message = 'Bye, Vue!' // this.message를 Bye, Vue로 변경
+            },
+          }
         })
-    </script>
+  </script>
 </body>
 ```
 
@@ -273,7 +273,7 @@ const app = new Vue({
     - 값에는 JS 표현식을 작성할 수 있음
 - directive의 역할은 `표현식의 값이 변경될 때 반응적으로 DOM에 적용하는 것`
 
-#### Directives 기본 구성
+### Directives 기본 구성
 ![directives](https://user-images.githubusercontent.com/89833631/198959183-692dc257-6552-4e95-8f60-9b97f6371e70.png)
 - `:`을 통해 전달인자를 받을 수 있음
 - `.`으로 표시되는 특수 접미사 - directive를 특별한 방법으로 바인딩해야 함
@@ -302,10 +302,245 @@ const app = new Vue({
   </script>
 </body>
 ```
-- v-text
-    - Template Interpolation과 함께 가장 기본적인 바인딩 방법
-    - {{ }}과 유사한 역할
-- v-html
-    - RAW HTML을 표현할 수 있는 방법
-    - 단, `사용자가 입력하거나 제공하는 컨텐츠에는 절대 사용 금지`
-    - XXS 공격 참고
+####  `v-text`
+- Template Interpolation과 함께 가장 기본적인 바인딩 방법
+- {{ }}과 유사한 역할
+#### `v-html`
+- RAW HTML을 표현할 수 있는 방법
+- 단, `사용자가 입력하거나 제공하는 컨텐츠에는 절대 사용 금지` (e.g. input)
+- XXS 공격 참고
+
+```html
+  <!-- 3. v-show && v-if -->
+<div id="app3">
+    <p v-show="isActive">보이니? 안보이니?</p>
+    <p v-if="isActive">안보이니? 보이니?</p>
+</div>
+<script>
+// 3. v-show && v-if
+    const app3 = new Vue({
+      el: '#app3',
+      data: {
+        isActive: false
+        // isActive: true
+      }
+    })
+</script>
+```
+#### `v-show`
+- 표현식에 작성된 값에 다라 element를 보여줄 것인지를 결정
+    - boolean 값이 변경될 때마다 반응(위의 코드에서는 isActive가 false이면 p태그가 안보이고, true이면 보이게 됨)
+- 대상 element의 display 속성을 기본 속성과 none으로 toggle
+    - `display:none`이기 때문에 보이지만 않을 뿐 자리는 차지함
+- 요소 자체는 항상 DOM에 렌더링됨
+
+#### `v-if`
+- v-show와 사용 방법은 동일
+- isActive의 값이 변경될 때 반응
+- 단 `값이 false인 경우, DOM에서 사라짐`
+- v-if, v-else-if, v-else 형태로 사용
+- 일반적으로 v-show보다 자주 쓰임
+
+> **v-show vs v-if**  
+> - v-show (Expensive initial load, cheap toggle)  
+    - 표현식의 결과와 상관없이 렌더링되므로 초기 렌더링에 필요한 비용은 v-if보다 높을 수 있음  
+    - display 속성 변경으로 표현 여부를 판단하므로 렌더링 후 toggle 비용은 적음  
+> - v-if (Cheap initial load, expensive toggle)
+    - 표현식의 결과가 false인 경우 렌더링조차 되지 않으므로 초기 렌더링 비용이 v-show보다 적을 수 있음
+    - but, 표현식 결과 값이 자주 변경되는 경우 잦은 재-렌더링으로 비용 증가할 수 있음  
+
+##### [참고] 특수속성 key
+- `v-for 사용 시 반드시 key 속성을 각 요소에 작성하여야 함`
+- 주로 v-for directive 작성 시 사용
+- vue 화면 구성할 때 이전과 달라진 점을 확인하기 위하여 사용 
+    - => key 값이 중복되어서는 안 됨 (경고! : Duplicate keys detected, This may cause an update error)
+    - 객체에서는 {key:value}의 key 값을 그대로 사용하는 것이 일반적임
+- 각 요소가 고유한 값을 가지고 있다면 생략 가능
+```html
+<body>
+  <!-- 3. v-for -->
+  <div id="app">
+    <h2>String</h2>
+    <div v-for="char in myStr">
+      {{ char }}
+    </div>
+    <div v-for="(char, index) in myStr" :key="index">
+      <p>{{ index }}번째 문자열 {{ char }}</p>
+    </div>
+
+    <h2>Array</h2>
+    <div v-for="(item, index) in myArr" :key="index">
+      <p>{{ index }}번째 아이템 {{ item }}</p>
+    </div>
+
+    <div v-for="(item, index) in myArr2" :key="`arry-${index}`"> 
+        <!-- 배열에서는 key의 값을 대체할 것이 없기 때문에 문자열+index 조합으로 사용하기 도 함 -->
+      <p>{{ index }}번째 아이템</p>
+		  <p>{{ item.name }}</p>
+    </div>
+
+    <h2>Object</h2>
+    <div v-for="value in myObj">
+      <p>{{ value }}</p>
+    </div>
+
+    <!-- 객체 -> (value, key)의 순서로 옴 -->
+    <div v-for="(value, key) in myObj"  :key="key"> 
+      <p>{{ key }} : {{ value }}</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        // 1. String
+        myStr: 'Hello, World!',
+
+        // 2-1. Array
+        myArr: ['python', 'django', 'vue.js'],
+
+        // 2-2. Array with Object
+        myArr2: [
+          { id: 1, name: 'python', completed: true},
+          { id: 2, name: 'django', completed: true},
+          { id: 3, name: 'vue.js', completed: false},
+        ],
+        
+        // 3. Object
+        myObj: {
+          name: 'harry',
+          age: 27
+        },
+      }
+    })
+  </script>
+</body>
+```
+#### v-on
+- `:`을 통해 전달받은 인자를 확인
+- 값으로 JS 표현식 작성
+- addEventListener의 첫번째 인자와 동일한 값들로 구성
+- 대기하고 있던 이벤트가 발생하면 할당된 표현식 실행
+
+```html
+<div id="app">
+    <!-- 아래 버튼을 click하면 app객체의 data의 number이라는 값을 1씩 증가시킴-->
+    <button v-on:click="number++">increase Number</button>
+    <p>{{ number }}</p> <!--app의 number 데이터를 출력함-->
+
+    <!-- 아래 버튼을 click하면 app객체의 data의 isActive(bool)이라는 값을 false/true로 토글함-->
+    <button v-on:click="toggleActive">toggle isActive</button>
+    <p>{{ isActive }}</p>
+</div>
+<script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        number: 0,
+        isActive: false,
+      },
+      methods: {
+        toggleActive: function () {
+          this.isActive = !this.isActive
+        },
+      }
+    })
+</script>
+```
+- `v-on`이 많이 쓰이기 때문에 `@`이라는 축약어를 만듦
+```html
+<!-- 메서드에 인자를 전달할 수 있음 -->
+<button @click="checkActive(isActive)">check isActive</button>
+<script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        number: 0,
+        isActive: false,
+      },
+      methods: {
+        checkActive: function (check) {
+          console.log(check)
+        }
+      }
+    })
+</script>
+```
+- method를 통한 data 조작 가능
+- `:`를 통해 전달된 인자에 따라 특별한 modifier(수식어)가 있을 수 있음
+    - ex) v-on:keyup.enter 등
+    - vue2 guide > api > v-on 참고   
+
+#### v-bind
+- 엘리먼트의 상태값을 바꿔줄때 사용   
+- Vue data의 변화에 반응하여 DOM에 반영하므로 상황에 따라 유동적으로 할당 가능
+- `v-bind`는 `:`로 축약할 수 있음 (e.g. :class 등)
+```html
+<div id="app2">
+    <a v-bind:href="url">Go To GOOGLE</a> 
+
+    <p v-bind:class="redTextClass">빨간 글씨</p>
+    <p v-bind:class="{ 'red-text': true }">빨간 글씨</p>
+    <p v-bind:class="[redTextClass, borderBlack]">빨간 글씨, 검은 테두리</p>
+
+    <p :class="theme">상황에 따른 활성화</p>
+    <button @click="darkModeToggle">dark Mode {{ isActive }}</button>
+</div>
+<script>
+    const app2 = new Vue({
+      el: '#app2',
+      data: {
+        url: 'https://www.google.com/',
+        redTextClass: 'red-text',
+        borderBlack: 'border-black',
+        isActive: true,
+        theme: 'dark-mode'
+      },
+      methods: {
+        darkModeToggle() {
+          this.isActive = !this.isActive
+          if (this.isActive) {
+            this.theme = 'dark-mode'
+          } else {
+            this.theme = 'white-mode'
+          }
+        }
+      }
+    })
+</script>
+```
+
+#### v-model
+- Vue instance와 DOM의 양방향 바인딩
+- Vue data 변경 시 v-model로 연결된 사용자 입력 element에도 적용 
+```html
+<div id="app">
+    <h2>1. Input -> Data</h2>
+    <h3>{{ myMessage }}</h3>
+    <input @input="onInputChange" type="text">
+    <hr>
+
+    <h2>2. Input <-> Data</h2>
+    <h3>{{ myMessage2 }}</h3>
+    <input v-model="myMessage2" type="text">
+    <hr>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        myMessage: '',
+        myMessage2: '',
+      },
+      methods: {
+        onInputChange: function (event) {
+          this.myMessage = event.target.value
+        },
+      }
+    })
+  </script>
+```
