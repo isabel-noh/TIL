@@ -20,27 +20,27 @@
 - 요소의 속성(property)을 사용하여 데이터 전달
 - props는 부모(상위)컴포넌트의 정보를 전달하기 위한 `사용자 지정 특성`
 - 자식(하위) 컴포넌트는 props옵션을 사용하여 수신하는 `props를 명시적으로 선언`하여야 함
-    - App.vue의 <HelloWorld/>요소에 msg="~"라는 property를 설정하였고, 하위 컴포넌트인 HelloWorld는 자신에게 부여된 msg property를 template에서 {{ msg }}의 형태로 사용한 것
+    - App.vue의 <HelloWorld/>요소에 msg="~"라는 property를 설정하였고, 하위 컴포넌트인 HelloWorld는 자신에게 부여된 msg property를 template에서 {{ msgTitle }}의 형태로 사용한 것
 ```vue
 <!-- App.vue -->
 <template>
   <div id="app">
     <!-- 3. 보여주기 -->
     <MyComponent />
-    <HelloWorld msg ="Welcome to Your Vue.js App"/>
+    <HelloWorld msg-title ="Welcome to Your Vue.js App"/>
   </div>
 </template>
 <!-- HelloWorld.vue -->
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>{{ msgTitle }}</h1>
   </div>
 </template>
 <script>
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    msgTitle: String
   }
 }
 </script>   
@@ -54,5 +54,12 @@ export default {
 - 전달받은 props를 type과 함께 명시
 - 컴포넌트를 문서화할 뿐만 아니라, 잘못된 타입이 전달하는 경우, 브라우저의 자바스크립트 콘솔에서 사용자에게 경고를 뿌림
 
+### Pass Props convention  
+부모 템플릿에서 kebab-case로 넘긴 변수를 자식의 스크립트에서 자동으로 camelCase로 변환하여 인식
+- 부모에서 넘겨주는 props
+  - kebab-case
+- 자식에서 받는 props
+  - camelCase
 
+ 
 ## Emit event
