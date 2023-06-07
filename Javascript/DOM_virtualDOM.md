@@ -149,7 +149,7 @@ let domNode = {
 
 Diffing 알고리즘을 통해 확인한 새로 바뀐 부분들을 DOM object에 적용 → **`재조정(reconciliation)`**
 
-### 4. 무조건 Virual DOM이 좋음?
+### 4. 무조건 virtual DOM이 좋음?
 
 정보만 제공하고, 사용자의 interaction이 많지 않은 페이지라면 Real DOM이 성능이 더 좋을수도 있다.
 
